@@ -1019,9 +1019,16 @@ img {
     justify-content: space-between;
 }
 
-.comment {
+.comment .comment-wrapper {
     display: flex;
     flex-direction: row;
+
+    gap: 0.7rem;
+}
+
+.comment {
+    display: flex;
+    flex-direction: column;
 
     gap: 0.7rem;
 }
@@ -1156,6 +1163,13 @@ img {
 .comment.reply-comment .comment-avatar img {
     width: 32px;
     height: 32px;
+}
+
+.comment.reply-comment .comment-avatar {
+    margin-top: 0;
+    margin-right: 0;
+    width: 35px;
+    height: 35px;
 }
 
 /* Replies container - positioned directly under parent comment */
