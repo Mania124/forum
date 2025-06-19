@@ -1019,9 +1019,16 @@ img {
     justify-content: space-between;
 }
 
-.comment {
+.comment .comment-wrapper {
     display: flex;
     flex-direction: row;
+
+    gap: 0.7rem;
+}
+
+.comment {
+    display: flex;
+    flex-direction: column;
 
     gap: 0.7rem;
 }
