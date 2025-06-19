@@ -1165,6 +1165,13 @@ img {
     height: 32px;
 }
 
+.comment.reply-comment .comment-avatar {
+    margin-top: 0;
+    margin-right: 0;
+    width: 35px;
+    height: 35px;
+}
+
 /* Replies container - positioned directly under parent comment */
 .replies-container {
     margin-top: 0.5rem;
