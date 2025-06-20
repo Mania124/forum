@@ -49,16 +49,13 @@ export class PostForm {
                     </div>
 
                     <!-- Category Selector -->
-                    <div class="form-group" style="flex: 1; position: relative;">
-                        <label></label>
-                        <div id="categoryDropdown" class="dropdown" style="position: relative;">
-                            <div id="dropdownToggle" class="dropdown-toggle" tabindex="0" 
-                                 style="border: 1px solid #ccc; padding: 5px; cursor: pointer;">
-                                 Select categories
+                    <div class="form-group" style="flex: 1;">
+                        <label for="categoryDropdown" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-color);">Categories</label>
+                        <div id="categoryDropdown" class="dropdown">
+                            <div id="dropdownToggle" class="dropdown-toggle" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
+                                <span id="dropdownText">Select categories</span>
                             </div>
-                            <div id="dropdownMenu" class="dropdown-menu hidden" 
-                                 style="position: absolute; background: white; border: 1px solid #ccc; 
-                                        max-height: 150px; overflow-y: auto; width: 100%; z-index: 100;">
+                            <div id="dropdownMenu" class="dropdown-menu hidden" role="listbox">
                                 <!-- Categories will load here -->
                             </div>
                         </div>
@@ -159,15 +156,17 @@ export class PostForm {
      */
     buildSubmissionData(formData) {
         const submitFormData = new FormData();
-        
+
         submitFormData.append("title", formData.title);
         submitFormData.append("content", formData.content);
-        
+
         if (formData.imageInput && formData.imageInput.files[0]) {
             submitFormData.append("image", formData.imageInput.files[0]);
         }
-        
+
+        console.log("DEBUG: Selected categories:", formData.selectedCategories);
         submitFormData.append("category_names", JSON.stringify(formData.selectedCategories));
+        console.log("DEBUG: Sending category_names as JSON:", JSON.stringify(formData.selectedCategories));
 
         return submitFormData;
     }

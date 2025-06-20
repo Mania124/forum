@@ -115,6 +115,15 @@ func GetPost(db *sql.DB, postID int) (models.Post, error) {
 		post.CategoryIDs = append(post.CategoryIDs, catID)
 	}
 
+	// Get category names
+	categoryNames, err := GetCategoryNamesByIDs(db, post.CategoryIDs)
+	if err != nil {
+		// Log error but don't fail the entire request
+		fmt.Printf("Warning: Failed to get category names for post %d: %v\n", post.ID, err)
+		categoryNames = []string{}
+	}
+	post.CategoryNames = categoryNames
+
 	return post, nil
 }
 
@@ -198,10 +207,23 @@ func GetPosts(db *sql.DB, page, limit int) ([]models.Post, error) {
 		}
 	}
 
-	// Build final slice from postMap
+	// Build final slice from postMap in the original order and fetch category names
 	posts := make([]models.Post, 0, len(postMap))
-	for _, post := range postMap {
-		posts = append(posts, *post)
+
+	// Iterate through postIDs to maintain the original order from the SQL query
+	for _, postIDInterface := range postIDs {
+		postID := postIDInterface.(int)
+		if post, ok := postMap[postID]; ok {
+			// Get category names for this post
+			categoryNames, err := GetCategoryNamesByIDs(db, post.CategoryIDs)
+			if err != nil {
+				// Log error but don't fail the entire request
+				fmt.Printf("Warning: Failed to get category names for post %d: %v\n", post.ID, err)
+				categoryNames = []string{}
+			}
+			post.CategoryNames = categoryNames
+			posts = append(posts, *post)
+		}
 	}
 
 	return posts, nil
@@ -502,6 +524,39 @@ func GetCategories(db *sql.DB) ([]models.Category, error) {
 		categories = append(categories, category)
 	}
 	return categories, nil
+}
+
+// GetCategoryNamesByIDs retrieves category names for given category IDs
+func GetCategoryNamesByIDs(db *sql.DB, categoryIDs []int) ([]string, error) {
+	if len(categoryIDs) == 0 {
+		return []string{}, nil
+	}
+
+	// Build query with placeholders
+	placeholders := make([]string, len(categoryIDs))
+	args := make([]interface{}, len(categoryIDs))
+	for i, id := range categoryIDs {
+		placeholders[i] = "?"
+		args[i] = id
+	}
+
+	query := fmt.Sprintf(`SELECT name FROM categories WHERE id IN (%s) ORDER BY name`, strings.Join(placeholders, ","))
+
+	rows, err := db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var names []string
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			return nil, err
+		}
+		names = append(names, name)
+	}
+	return names, nil
 }
 
 // UpdatePost updates an existing post's title and content

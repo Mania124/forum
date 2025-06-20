@@ -31,6 +31,7 @@ export class PostCard {
             </div>
             <div class="post-content">
                 <div class="post-title">${post.title}</div>
+                ${PostCard.renderCategories(post.category_names || [])}
                 <div class="post-image hidden">
                     <img src="http://localhost:8080${post.image_url || ''}" alt="Post image" onerror="this.parentElement.innerHTML='<div class=\\'image-error\\'>Image unavailable</div>'"/>
                 </div>
@@ -55,6 +56,23 @@ export class PostCard {
         }
 
         return postDiv;
+    }
+
+    /**
+     * Render categories for a post
+     * @param {Array} categoryNames - Array of category names
+     * @returns {string} - HTML string for categories
+     */
+    static renderCategories(categoryNames) {
+        if (!categoryNames || categoryNames.length === 0) {
+            return '';
+        }
+
+        const categoriesHTML = categoryNames.map(name =>
+            `<span class="post-category">${name}</span>`
+        ).join('');
+
+        return `<div class="post-categories">${categoriesHTML}</div>`;
     }
 
     /**
@@ -252,6 +270,7 @@ export class PostCard {
             </div>
 
             <div class="post-full-content">
+                ${PostCard.renderCategories(post.category_names || [])}
                 ${post.image_url ? `
                     <div class="post-image-container">
                         <img src="http://localhost:8080${post.image_url}" alt="Post image" class="post-image-full" onerror="this.parentElement.innerHTML='<div class=\\'image-error\\'>Image unavailable</div>'">
