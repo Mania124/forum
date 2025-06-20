@@ -153,6 +153,19 @@ img {
     white-space: nowrap;
 }
 
+.clickable-username {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+.clickable-username:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    transform: translateY(-1px);
+}
+
 .logout-btn {
     background: none;
     border: none;
