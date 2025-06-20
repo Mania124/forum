@@ -101,10 +101,21 @@ export class CategoryManager {
         // Toggle dropdown
         const dropdownToggle = document.getElementById("dropdownToggle");
         const dropdownMenu = document.getElementById("dropdownMenu");
-        
+
         if (dropdownToggle) {
             dropdownToggle.addEventListener("click", () => {
+                const isHidden = dropdownMenu.classList.contains("hidden");
                 dropdownMenu.classList.toggle("hidden");
+                dropdownToggle.classList.toggle("active", !isHidden);
+                dropdownToggle.setAttribute("aria-expanded", !isHidden);
+            });
+
+            // Handle keyboard navigation
+            dropdownToggle.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    dropdownToggle.click();
+                }
             });
         }
 
@@ -113,6 +124,8 @@ export class CategoryManager {
             const dropdown = document.getElementById("categoryDropdown");
             if (dropdown && !dropdown.contains(e.target)) {
                 dropdownMenu.classList.add("hidden");
+                dropdownToggle.classList.remove("active");
+                dropdownToggle.setAttribute("aria-expanded", "false");
             }
         });
 
@@ -127,22 +140,45 @@ export class CategoryManager {
         try {
             const categories = await ApiUtils.get('/api/categories');
             const menu = document.getElementById("dropdownMenu");
-            
+
             if (!menu) return;
-            
+
             menu.innerHTML = "";
             categories.forEach(cat => {
                 const item = document.createElement("label");
-                item.style.display = "block";
-                item.style.padding = "5px 10px";
                 item.innerHTML = `
                     <input type="checkbox" name="category_names[]" value="${cat.name}" />
-                    ${cat.name}
+                    <span>${cat.name}</span>
                 `;
+
+                // Add change event listener to update dropdown text
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                checkbox.addEventListener('change', () => {
+                    this.updateDropdownText();
+                });
+
                 menu.appendChild(item);
             });
         } catch (error) {
             console.error("Failed to load categories:", error);
+        }
+    }
+
+    /**
+     * Update dropdown toggle text based on selected categories
+     */
+    updateDropdownText() {
+        const dropdownText = document.getElementById("dropdownText");
+        const selectedCategories = this.getSelectedCategories();
+
+        if (!dropdownText) return;
+
+        if (selectedCategories.length === 0) {
+            dropdownText.textContent = "Select categories";
+        } else if (selectedCategories.length === 1) {
+            dropdownText.textContent = selectedCategories[0];
+        } else {
+            dropdownText.textContent = `${selectedCategories.length} categories selected`;
         }
     }
 
@@ -163,12 +199,26 @@ export class CategoryManager {
      */
     resetCategoryDropdown() {
         const dropdownMenu = document.getElementById("dropdownMenu");
+        const dropdownToggle = document.getElementById("dropdownToggle");
+        const dropdownText = document.getElementById("dropdownText");
+
         if (dropdownMenu) {
             dropdownMenu.classList.add("hidden");
-            
+
             // Uncheck all checkboxes
             const checkboxes = dropdownMenu.querySelectorAll('input[type="checkbox"]');
             checkboxes.forEach(cb => cb.checked = false);
+        }
+
+        // Reset dropdown text
+        if (dropdownText) {
+            dropdownText.textContent = "Select categories";
+        }
+
+        // Remove active state
+        if (dropdownToggle) {
+            dropdownToggle.classList.remove("active");
+            dropdownToggle.setAttribute("aria-expanded", "false");
         }
     }
 

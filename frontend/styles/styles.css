@@ -904,6 +904,123 @@ img {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* Category Dropdown Styling */
+.dropdown {
+    position: relative;
+    width: 100%;
+}
+
+.dropdown-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: var(--primary-color);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    transition: var(--transition);
+    min-height: 44px;
+    box-sizing: border-box;
+}
+
+.dropdown-toggle:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(29, 92, 126, 0.1);
+}
+
+.dropdown-toggle:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(29, 92, 126, 0.2);
+}
+
+.dropdown-toggle::after {
+    content: '▼';
+    font-size: 0.8rem;
+    color: var(--muted-text);
+    transition: var(--transition);
+    margin-left: 0.5rem;
+}
+
+.dropdown-toggle.active::after {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--primary-color);
+    border: 2px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 var(--radius) var(--radius);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin-top: -2px;
+}
+
+.dropdown-menu.hidden {
+    display: none;
+}
+
+.dropdown-menu label {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    border-bottom: 1px solid var(--hover-color2);
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.dropdown-menu label:last-child {
+    border-bottom: none;
+}
+
+.dropdown-menu label:hover {
+    background: var(--hover-color2);
+}
+
+.dropdown-menu input[type="checkbox"] {
+    margin-right: 0.75rem;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent-color);
+    cursor: pointer;
+}
+
+.dropdown-menu input[type="checkbox"]:checked + span {
+    color: var(--accent-color);
+    font-weight: 500;
+}
+
+/* Custom scrollbar for dropdown */
+.dropdown-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dropdown-menu::-webkit-scrollbar-track {
+    background: var(--hover-color2);
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+.dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-text);
+}
+
 
 .post-body {
     font-size: 1rem;
