@@ -157,7 +157,15 @@ func LoginUser(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create session in database
+	// Delete all existing sessions for this user (single session policy)
+	// This ensures only the most recent login session persists
+	err = sqlite.DeleteAllUserSessions(db, user.ID)
+	if err != nil {
+		log.Printf("Warning: Failed to delete existing sessions for user %s: %v", user.ID, err)
+		// Continue anyway - this is not critical for login to succeed
+	}
+
+	// Create new session in database (this will be the only active session)
 	sessionID, err := sqlite.CreateSession(db, user.ID)
 	if err != nil {
 		utils.SendJSONError(w, "Failed to create session", http.StatusInternalServerError)
