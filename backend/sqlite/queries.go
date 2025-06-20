@@ -207,18 +207,23 @@ func GetPosts(db *sql.DB, page, limit int) ([]models.Post, error) {
 		}
 	}
 
-	// Build final slice from postMap and fetch category names
+	// Build final slice from postMap in the original order and fetch category names
 	posts := make([]models.Post, 0, len(postMap))
-	for _, post := range postMap {
-		// Get category names for this post
-		categoryNames, err := GetCategoryNamesByIDs(db, post.CategoryIDs)
-		if err != nil {
-			// Log error but don't fail the entire request
-			fmt.Printf("Warning: Failed to get category names for post %d: %v\n", post.ID, err)
-			categoryNames = []string{}
+
+	// Iterate through postIDs to maintain the original order from the SQL query
+	for _, postIDInterface := range postIDs {
+		postID := postIDInterface.(int)
+		if post, ok := postMap[postID]; ok {
+			// Get category names for this post
+			categoryNames, err := GetCategoryNamesByIDs(db, post.CategoryIDs)
+			if err != nil {
+				// Log error but don't fail the entire request
+				fmt.Printf("Warning: Failed to get category names for post %d: %v\n", post.ID, err)
+				categoryNames = []string{}
+			}
+			post.CategoryNames = categoryNames
+			posts = append(posts, *post)
 		}
-		post.CategoryNames = categoryNames
-		posts = append(posts, *post)
 	}
 
 	return posts, nil
