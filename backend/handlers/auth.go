@@ -37,6 +37,38 @@ func RegisterUser(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Validate and sanitize username
+	sanitizedUsername, err := utils.ValidateAndSanitizeString(username, 30, "username")
+	if err != nil {
+		utils.SendJSONError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Additional username format validation
+	if err := utils.ValidateUsername(sanitizedUsername); err != nil {
+		utils.SendJSONError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Validate and sanitize email
+	sanitizedEmail, err := utils.ValidateAndSanitizeString(email, 100, "email")
+	if err != nil {
+		utils.SendJSONError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Additional email format validation
+	if err := utils.ValidateEmail(sanitizedEmail); err != nil {
+		utils.SendJSONError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Validate password strength
+	if err := utils.ValidatePassword(password); err != nil {
+		utils.SendJSONError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	// Handle avatar upload
 	var avatarURL string
 
@@ -106,7 +138,7 @@ func RegisterUser(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Save user to DB
-	err = sqlite.CreateUser(db, username, email, hashedPassword, avatarURL)
+	err = sqlite.CreateUser(db, sanitizedUsername, sanitizedEmail, hashedPassword, avatarURL)
 	if err != nil {
 		if sqlite.IsUniqueConstraintError(err) {
 			utils.SendJSONError(w, "Username or email already exists", http.StatusConflict)
@@ -140,8 +172,21 @@ func LoginUser(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Validate and sanitize email
+	sanitizedEmail, err := utils.ValidateAndSanitizeString(credentials.Email, 100, "email")
+	if err != nil {
+		utils.SendJSONError(w, "Invalid email format", http.StatusBadRequest)
+		return
+	}
+
+	// Additional email format validation
+	if err := utils.ValidateEmail(sanitizedEmail); err != nil {
+		utils.SendJSONError(w, "Invalid email format", http.StatusBadRequest)
+		return
+	}
+
 	// Get user from DB
-	user, err := sqlite.GetUserByEmail(db, credentials.Email)
+	user, err := sqlite.GetUserByEmail(db, sanitizedEmail)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			utils.SendJSONError(w, "Invalid email or password", http.StatusUnauthorized)
@@ -247,9 +292,17 @@ func RequireAuth(db *sql.DB, w http.ResponseWriter, r *http.Request) (string, bo
 
 func GetOwner(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	userId := r.URL.Query().Get("user_id")
+
+	// Validate user ID format (UUID)
+	if err := utils.ValidateUUID(userId); err != nil {
+		utils.SendJSONError(w, "Invalid user ID format", http.StatusBadRequest)
+		return
+	}
+
 	user, err := sqlite.GetUserByID(db, userId)
 	if err != nil {
-		utils.SendJSONError(w, "Wrong User Id", http.StatusBadRequest)
+		utils.SendJSONError(w, "User not found", http.StatusNotFound)
+		return
 	}
 	utils.SendJSONResponse(w, user, http.StatusOK)
 }

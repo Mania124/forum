@@ -2,10 +2,15 @@ package utils
 
 import (
 	"database/sql"
+	"fmt"
+	"html"
 	"log"
 	"net/http"
+	"regexp"
 	"strconv"
+	"strings"
 	"time"
+	"unicode/utf8"
 
 	"forum/sqlite"
 
@@ -108,11 +113,134 @@ func GetPaginationParams(r *http.Request) (int, int) {
 	return page, limit
 }
 
-// func Contains(slice []int, str int) bool {
-// 	for _, w := range slice {
-// 		if w == str {
-// 			return true
-// 		}
-// 	}
-// 	return false
-// }
+// Input Validation and Sanitization Functions
+
+// ValidateAndSanitizeString validates and sanitizes string input
+func ValidateAndSanitizeString(input string, maxLength int, fieldName string) (string, error) {
+	// Check for null bytes (potential for SQL injection bypass)
+	if strings.Contains(input, "\x00") {
+		return "", fmt.Errorf("%s contains invalid characters", fieldName)
+	}
+
+	// Trim whitespace
+	input = strings.TrimSpace(input)
+
+	// Check length
+	if len(input) == 0 {
+		return "", fmt.Errorf("%s cannot be empty", fieldName)
+	}
+
+	if len(input) > maxLength {
+		return "", fmt.Errorf("%s exceeds maximum length of %d characters", fieldName, maxLength)
+	}
+
+	// Check for valid UTF-8
+	if !utf8.ValidString(input) {
+		return "", fmt.Errorf("%s contains invalid UTF-8 characters", fieldName)
+	}
+
+	// HTML escape to prevent XSS
+	sanitized := html.EscapeString(input)
+
+	return sanitized, nil
+}
+
+// ValidateEmail validates email format
+func ValidateEmail(email string) error {
+	// Basic email regex pattern
+	emailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
+
+	if !emailRegex.MatchString(email) {
+		return fmt.Errorf("invalid email format")
+	}
+
+	return nil
+}
+
+// ValidateUsername validates username format
+func ValidateUsername(username string) error {
+	// Username should only contain alphanumeric characters, underscores, and hyphens
+	usernameRegex := regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
+
+	if !usernameRegex.MatchString(username) {
+		return fmt.Errorf("username can only contain letters, numbers, underscores, and hyphens")
+	}
+
+	if len(username) < 3 || len(username) > 30 {
+		return fmt.Errorf("username must be between 3 and 30 characters")
+	}
+
+	return nil
+}
+
+// ValidatePassword validates password strength
+func ValidatePassword(password string) error {
+	if len(password) < 8 {
+		return fmt.Errorf("password must be at least 8 characters long")
+	}
+
+	if len(password) > 128 {
+		return fmt.Errorf("password must be less than 128 characters")
+	}
+
+	// Check for at least one letter and one number
+	hasLetter := regexp.MustCompile(`[a-zA-Z]`).MatchString(password)
+	hasNumber := regexp.MustCompile(`[0-9]`).MatchString(password)
+
+	if !hasLetter || !hasNumber {
+		return fmt.Errorf("password must contain at least one letter and one number")
+	}
+
+	return nil
+}
+
+// ValidatePostContent validates post title and content
+func ValidatePostContent(title, content string) error {
+	if _, err := ValidateAndSanitizeString(title, 200, "title"); err != nil {
+		return err
+	}
+
+	if _, err := ValidateAndSanitizeString(content, 10000, "content"); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ValidateCommentContent validates comment content
+func ValidateCommentContent(content string) error {
+	if _, err := ValidateAndSanitizeString(content, 2000, "comment"); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ValidateID validates and converts string ID to integer
+func ValidateID(idStr string, fieldName string) (int, error) {
+	if idStr == "" {
+		return 0, fmt.Errorf("%s cannot be empty", fieldName)
+	}
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return 0, fmt.Errorf("invalid %s format", fieldName)
+	}
+
+	if id <= 0 {
+		return 0, fmt.Errorf("%s must be a positive integer", fieldName)
+	}
+
+	return id, nil
+}
+
+// ValidateUUID validates UUID format for user IDs
+func ValidateUUID(uuid string) error {
+	uuidRegex := regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`)
+
+	if !uuidRegex.MatchString(uuid) {
+		return fmt.Errorf("invalid UUID format")
+	}
+
+	return nil
+}

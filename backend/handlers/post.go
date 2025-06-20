@@ -34,6 +34,25 @@ func CreatePost(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	title := r.FormValue("title")
 	content := r.FormValue("content")
 
+	// Validate and sanitize post content
+	if err := utils.ValidatePostContent(title, content); err != nil {
+		utils.SendJSONError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Sanitize title and content
+	sanitizedTitle, err := utils.ValidateAndSanitizeString(title, 200, "title")
+	if err != nil {
+		utils.SendJSONError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	sanitizedContent, err := utils.ValidateAndSanitizeString(content, 10000, "content")
+	if err != nil {
+		utils.SendJSONError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	// Get category names from the form
 	var categoryNames []string
 
@@ -95,7 +114,7 @@ func CreatePost(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create the post with categories
-	post, err := sqlite.CreatePost(db, userID, categoryIDs, title, content, imageURL)
+	post, err := sqlite.CreatePost(db, userID, categoryIDs, sanitizedTitle, sanitizedContent, imageURL)
 	if err != nil {
 		log.Println("Error creating post:", err)
 		utils.SendJSONError(w, "Failed to create post", http.StatusInternalServerError)

@@ -23,7 +23,14 @@ func CreateCategory(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = sqlite.CreateCategory(db, category.Name)
+	// Validate and sanitize category name
+	sanitizedName, err := utils.ValidateAndSanitizeString(category.Name, 50, "category name")
+	if err != nil {
+		utils.SendJSONError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = sqlite.CreateCategory(db, sanitizedName)
 	if err != nil {
 		utils.SendJSONError(w, "Failed to create category", http.StatusInternalServerError)
 		return

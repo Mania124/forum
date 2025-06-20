@@ -24,6 +24,18 @@ func CreateComment(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Validate and sanitize comment content
+	if err := utils.ValidateCommentContent(comment.Content); err != nil {
+		utils.SendJSONError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	sanitizedContent, err := utils.ValidateAndSanitizeString(comment.Content, 2000, "comment")
+	if err != nil {
+		utils.SendJSONError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	// Validate user session
 	userID, ok := RequireAuth(db, w, r)
 	if !ok || userID == "" {
@@ -39,7 +51,7 @@ func CreateComment(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create top-level comment
-	comm, err := sqlite.CreateComment(db, comment.UserID, comment.PostID, comment.Content)
+	comm, err := sqlite.CreateComment(db, comment.UserID, comment.PostID, sanitizedContent)
 	if err != nil {
 		utils.SendJSONError(w, "Failed to create comment", http.StatusInternalServerError)
 		return
@@ -58,6 +70,18 @@ func CreateReplComment(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&reply)
 	if err != nil {
 		http.Error(w, "Invalid reply data", http.StatusBadRequest)
+		return
+	}
+
+	// Validate and sanitize reply content
+	if err := utils.ValidateCommentContent(reply.Content); err != nil {
+		utils.SendJSONError(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	sanitizedReplyContent, err := utils.ValidateAndSanitizeString(reply.Content, 2000, "reply")
+	if err != nil {
+		utils.SendJSONError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -82,7 +106,7 @@ func CreateReplComment(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create the reply
-	createdReply, err := sqlite.CreateReplyComment(db, reply.UserID, reply.ParentCommentID, reply.Content)
+	createdReply, err := sqlite.CreateReplyComment(db, reply.UserID, reply.ParentCommentID, sanitizedReplyContent)
 	if err != nil {
 		utils.SendJSONError(w, "Failed to create reply", http.StatusInternalServerError)
 		return

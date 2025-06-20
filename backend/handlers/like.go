@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"forum/sqlite"
 	"forum/utils"
@@ -50,6 +49,17 @@ func ToggleLike(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Validate IDs are positive integers
+	if request.PostID != nil && *request.PostID <= 0 {
+		http.Error(w, "Invalid post_id", http.StatusBadRequest)
+		return
+	}
+
+	if request.CommentID != nil && *request.CommentID <= 0 {
+		http.Error(w, "Invalid comment_id", http.StatusBadRequest)
+		return
+	}
+
 	// Call the updated toggle function with type
 	err := sqlite.ToggleLike(db, userID, request.PostID, request.CommentID, request.Type)
 	if err != nil {
@@ -78,16 +88,16 @@ func GetReactions(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	)
 
 	if postIDStr != "" {
-		var id int
-		if id, err = strconv.Atoi(postIDStr); err != nil {
-			http.Error(w, "Invalid post_id", http.StatusBadRequest)
+		id, err := utils.ValidateID(postIDStr, "post_id")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		postID = &id
 	} else if commentIDStr != "" {
-		var id int
-		if id, err = strconv.Atoi(commentIDStr); err != nil {
-			http.Error(w, "Invalid comment_id", http.StatusBadRequest)
+		id, err := utils.ValidateID(commentIDStr, "comment_id")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		commentID = &id
