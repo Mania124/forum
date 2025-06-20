@@ -35,7 +35,25 @@ func CreatePost(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	content := r.FormValue("content")
 
 	// Get category names from the form
-	categoryNames := r.Form["category_names[]"]
+	var categoryNames []string
+
+	// Try to get as JSON string first (from frontend)
+	categoryNamesJSON := r.FormValue("category_names")
+	log.Printf("DEBUG: categoryNamesJSON = '%s'", categoryNamesJSON)
+
+	if categoryNamesJSON != "" {
+		err := json.Unmarshal([]byte(categoryNamesJSON), &categoryNames)
+		if err != nil {
+			log.Printf("Error parsing category_names JSON: %v", err)
+			// Fallback to form array
+			categoryNames = r.Form["category_names[]"]
+		}
+	} else {
+		// Fallback to form array
+		categoryNames = r.Form["category_names[]"]
+	}
+
+	log.Printf("DEBUG: Final categoryNames = %v", categoryNames)
 
 	// Validate user session
 	userID, ok := RequireAuth(db, w, r)

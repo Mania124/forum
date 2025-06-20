@@ -188,10 +188,18 @@ export class CategoryManager {
      */
     getSelectedCategories() {
         const form = document.getElementById("postForm");
-        if (!form) return [];
-        
-        return Array.from(form.querySelectorAll('input[name="category_names[]"]:checked'))
-            .map(cb => cb.value);
+        if (!form) {
+            console.log("DEBUG: No postForm found");
+            return [];
+        }
+
+        const checkboxes = form.querySelectorAll('input[name="category_names[]"]:checked');
+        console.log("DEBUG: Found checkboxes:", checkboxes.length);
+
+        const selectedCategories = Array.from(checkboxes).map(cb => cb.value);
+        console.log("DEBUG: Selected categories:", selectedCategories);
+
+        return selectedCategories;
     }
 
     /**

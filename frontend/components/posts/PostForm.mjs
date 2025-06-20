@@ -156,15 +156,17 @@ export class PostForm {
      */
     buildSubmissionData(formData) {
         const submitFormData = new FormData();
-        
+
         submitFormData.append("title", formData.title);
         submitFormData.append("content", formData.content);
-        
+
         if (formData.imageInput && formData.imageInput.files[0]) {
             submitFormData.append("image", formData.imageInput.files[0]);
         }
-        
+
+        console.log("DEBUG: Selected categories:", formData.selectedCategories);
         submitFormData.append("category_names", JSON.stringify(formData.selectedCategories));
+        console.log("DEBUG: Sending category_names as JSON:", JSON.stringify(formData.selectedCategories));
 
         return submitFormData;
     }
