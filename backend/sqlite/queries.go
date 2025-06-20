@@ -564,6 +564,15 @@ func DeleteSession(db *sql.DB, sessionID string) error {
 	return err
 }
 
+// DeleteAllUserSessions removes all sessions for a specific user
+// This enforces single session policy - only the most recent login persists
+func DeleteAllUserSessions(db *sql.DB, userID string) error {
+	_, err := db.Exec(`
+		DELETE FROM sessions WHERE user_id = ?
+	`, userID)
+	return err
+}
+
 func GetUserByID(db *sql.DB, userID string) (*models.User, error) {
 	var user models.User
 
