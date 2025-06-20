@@ -65,6 +65,8 @@ export class PostManager {
 
         this.postContainer.innerHTML = "";
 
+        // Render posts in chronological order (most recent first)
+        // Backend sends posts ordered by created_at DESC, we preserve this order
         for (const post of postsToRender) {
             const postCard = PostCard.create(post);
 
@@ -74,6 +76,7 @@ export class PostManager {
             // Setup post navigation for this post (pass app instance instead of router)
             PostCard.setupPostNavigation(postCard, this.app);
 
+            // Append to container - maintains chronological order from backend
             this.postContainer.appendChild(postCard);
         }
 
