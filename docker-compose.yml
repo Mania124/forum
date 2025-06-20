@@ -1,16 +1,76 @@
-version: "3.8"
+version: '3.8'
 
 services:
-  forum:
-    build: .
-    container_name: forum_app
-    restart: always
+  # Backend service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: forum-backend
+    restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "8080:8080"  # Expose backend port for direct access if needed
     volumes:
-      - forum_data:/app/data
+      # Persist uploaded files and database
+      - backend_data:/app/static
+      - database_data:/app/data
     environment:
-      - DATABASE_URL=/app/data/forum.db
+      - PORT=8080
+      - DB_PATH=/app/data/forum.db
+    networks:
+      - forum-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/api/categories"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
+  # Frontend service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: forum-frontend
+    restart: unless-stopped
+    ports:
+      - "8000:80"  # Main application port
+    depends_on:
+      - backend
+    networks:
+      - forum-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # Optional: Database management tool (Adminer)
+  adminer:
+    image: adminer:latest
+    container_name: forum-adminer
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    depends_on:
+      - backend
+    networks:
+      - forum-network
+    profiles:
+      - tools  # Only start with --profile tools
+
+# Networks
+networks:
+  forum-network:
+    driver: bridge
+    name: forum-internal
+
+# Volumes for data persistence
 volumes:
-  forum_data:
+  backend_data:
+    name: forum-backend-data
+    driver: local
+  database_data:
+    name: forum-database-data
+    driver: local

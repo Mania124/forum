@@ -1,0 +1,64 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+*.md
+
+# Docker files
+Dockerfile
+.dockerignore
+
+# Development files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Go specific
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
+
+# Build outputs
+forum-server
+main
+
+# Database files (will be in volumes)
+*.db
+*.sqlite
+*.sqlite3
+data/
+
+# Static files that will be uploaded at runtime
+static/pictures/*
+!static/pictures/.gitkeep
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# IDE files
+*.sublime-project
+*.sublime-workspace

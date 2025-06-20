@@ -3,7 +3,10 @@
  */
 
 export class ApiUtils {
-    static BASE_URL = 'http://localhost:8080';
+    // Use relative URLs for Docker deployment, fallback to localhost for development
+    static BASE_URL = window.location.hostname === 'localhost' && window.location.port === '8000'
+        ? '' // Use relative URLs when served through nginx proxy
+        : 'http://localhost:8080'; // Development fallback
 
     /**
      * Makes a GET request to the API
