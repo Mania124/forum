@@ -32,8 +32,14 @@ export class NavManager {
         }
 
         navLogoContainer.innerHTML = `
-            <img src="http://localhost:8080/static/pictures/forum-logo.png" alt="Forum" class="nav-logo">
+            <img src="http://localhost:8080/static/pictures/forum-logo.png" alt="Forum" class="nav-logo clickable-logo" title="Go to Home">
         `;
+
+        // Setup logo click handler for home navigation
+        const logoImg = navLogoContainer.querySelector('.nav-logo');
+        if (logoImg) {
+            logoImg.addEventListener('click', () => this.navigateToHome());
+        }
     }
 
     /**
@@ -125,13 +131,15 @@ export class NavManager {
     }
 
     /**
-     * Navigate to user profile
+     * Navigate to home page
      */
-    navigateToProfile() {
+    navigateToHome() {
         if (this.router) {
-            this.router.navigate('/profile');
+            this.router.navigate('/');
         } else {
-            console.warn('Router not available for profile navigation');
+            console.warn('Router not available for home navigation');
+            // Fallback: reload the page to home
+            window.location.href = '/';
         }
     }
 
