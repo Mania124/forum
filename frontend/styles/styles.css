@@ -75,36 +75,7 @@ img {
     transition: all 0.3s ease;
 }
 
-/* Search section */
-.nav-search {
-    position: relative;
-    display: flex;
-    align-items: center;
-    background: white;
-    padding: 8px;
-    border-radius: 20px;
-    border: 1px solid var(--border-color);
-    flex: 1;
-    max-width: 500px;
-    min-width: 180px;
-    transition: all 0.3s ease;
-}
 
-.nav-search input {
-    width: 100%;
-    padding: 8px 16px 8px 40px;
-    border: none;
-    outline: none;
-    background: transparent;
-    font-size: 0.95rem;
-}
-
-.search-icon {
-    position: absolute;
-    left: 12px;
-    color: #65676b;
-    font-size: 16px;
-}
 
 /* Auth section */
 .nav-auth {
@@ -192,10 +163,7 @@ img {
         gap: 0.8rem;
     }
 
-    .nav-search {
-        max-width: 400px;
-        min-width: 160px;
-    }
+
 
     .nav-auth {
         gap: 8px;
@@ -233,23 +201,12 @@ img {
         justify-content: space-between;
     }
 
-    /* Reorder navbar elements for mobile: Logo (left) | Search (center) | Auth (right) */
+    /* Reorder navbar elements for mobile: Logo (left) | Auth (right) */
     #navLogoContainer {
-        order: 1;
         flex-shrink: 0;
     }
 
-    .nav-search {
-        order: 2;
-        max-width: 200px;
-        min-width: 120px;
-        padding: 6px;
-        flex: 1;
-        margin: 0 0.5rem;
-    }
-
     .nav-auth {
-        order: 3;
         gap: 6px;
         flex-shrink: 0;
         margin-left: auto; /* Push auth to the right */
@@ -260,10 +217,7 @@ img {
         height: 32px;
     }
 
-    .nav-search input {
-        font-size: 0.9rem;
-        padding: 4px 8px;
-    }
+
 
     .nav-username {
         max-width: 80px;
@@ -295,23 +249,12 @@ img {
         justify-content: space-between;
     }
 
-    /* Mobile navbar layout: Logo (left) | Search (center) | Auth (right) */
+    /* Mobile navbar layout: Logo (left) | Auth (right) */
     #navLogoContainer {
-        order: 1;
         flex-shrink: 0;
     }
 
-    .nav-search {
-        order: 2;
-        max-width: 140px;
-        min-width: 100px;
-        padding: 4px;
-        flex: 1;
-        margin: 0 0.3rem;
-    }
-
     .nav-auth {
-        order: 3;
         gap: 4px;
         flex-shrink: 0;
         margin-left: auto; /* Keep auth on the right */
@@ -322,14 +265,7 @@ img {
         height: 28px;
     }
 
-    .nav-search input {
-        font-size: 0.8rem;
-        padding: 3px 6px;
-    }
 
-    .nav-search i {
-        font-size: 0.8rem;
-    }
 
     .nav-username {
         display: none; /* Hide username on very small screens */
@@ -378,21 +314,14 @@ img {
         flex-shrink: 0;
     }
 
-    .nav-search {
-        max-width: 120px;
-        min-width: 80px;
-        flex: 1;
-        margin: 0 0.2rem;
-    }
+
 
     .nav-auth {
         flex-shrink: 0;
         margin-left: auto;
     }
 
-    .nav-search input::placeholder {
-        font-size: 0.7rem;
-    }
+
 
     .nav-auth button {
         padding: 3px 5px;
