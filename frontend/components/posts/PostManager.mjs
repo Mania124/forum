@@ -14,6 +14,12 @@ export class PostManager {
         this.postContainer = document.getElementById("postFeed");
         this.router = null; // Will be set by the app
         this.app = null; // Will be set by the app
+
+        // Pagination state
+        this.currentPage = 1;
+        this.postsPerPage = 10;
+        this.hasMorePosts = true;
+        this.isLoading = false;
     }
 
     /**
@@ -33,24 +39,57 @@ export class PostManager {
     }
 
     /**
-     * Fetch all forum posts
+     * Fetch forum posts with pagination support
+     * @param {boolean} loadMore - Whether to load more posts (append) or reset (replace)
      * @returns {Array} - Array of posts
      */
-    async fetchForumPosts() {
+    async fetchForumPosts(loadMore = false) {
+        if (this.isLoading) return this.posts;
+
         try {
-            this.posts = await ApiUtils.get("/api/posts");
+            this.isLoading = true;
+
+            const page = loadMore ? this.currentPage + 1 : 1;
+            const url = `/api/posts?page=${page}&limit=${this.postsPerPage}`;
+
+            const newPosts = await ApiUtils.get(url);
+            const postsArray = newPosts || [];
+
+            if (loadMore) {
+                // Append new posts to existing ones
+                this.posts = [...this.posts, ...postsArray];
+                this.currentPage = page;
+            } else {
+                // Replace posts (initial load or refresh)
+                this.posts = postsArray;
+                this.currentPage = 1;
+            }
+
+            // Update hasMorePosts flag
+            this.hasMorePosts = postsArray.length === this.postsPerPage;
+
+            this.filteredPosts = [...this.posts];
+
             return this.posts;
+
         } catch (error) {
             console.error("Error fetching posts:", error);
-            return [];
+            if (!loadMore) {
+                this.posts = [];
+                this.filteredPosts = [];
+            }
+            return this.posts;
+        } finally {
+            this.isLoading = false;
         }
     }
 
     /**
      * Render posts in the feed
      * @param {Array} posts - Posts to render (optional, uses this.posts if not provided)
+     * @param {boolean} append - Whether to append posts or replace existing ones
      */
-    async renderPosts(posts = null) {
+    async renderPosts(posts = null, append = false) {
         const postsToRender = posts || this.posts;
 
         // Ensure we have a valid container
@@ -63,7 +102,10 @@ export class PostManager {
             return;
         }
 
-        this.postContainer.innerHTML = "";
+        // Clear container only if not appending
+        if (!append) {
+            this.postContainer.innerHTML = "";
+        }
 
         // Render posts in chronological order (most recent first)
         // Backend sends posts ordered by created_at DESC, we preserve this order
@@ -80,8 +122,15 @@ export class PostManager {
             this.postContainer.appendChild(postCard);
         }
 
-        // Load additional data for posts
-        await this.loadPostsData();
+        // Add pagination controls
+        this.renderPaginationControls();
+
+        // Load additional data for posts (only for new posts if appending)
+        if (append) {
+            await this.loadPostsDataForNewPosts(postsToRender);
+        } else {
+            await this.loadPostsData();
+        }
     }
 
     /**
@@ -92,6 +141,104 @@ export class PostManager {
         await this.loadPostsComments();
         await this.reactionManager.loadCommentsLikes();
         this.commentManager.initializeCommentForms();
+    }
+
+    /**
+     * Load additional data for specific posts (used when appending new posts)
+     * @param {Array} posts - Posts to load data for
+     */
+    async loadPostsDataForNewPosts(posts) {
+        // Load likes for new posts
+        await this.reactionManager.loadPostsLikes();
+
+        // Load comments for new posts only
+        for (const post of posts) {
+            const postId = post.id;
+            try {
+                const comments = await ApiUtils.get(`/api/comments/get?post_id=${postId}`);
+                const commentsArray = comments && Array.isArray(comments) ? comments : [];
+
+                let totalCommentCount = commentsArray.length;
+                commentsArray.forEach(comment => {
+                    const replies = comment.replies || comment.Replies;
+                    if (replies && Array.isArray(replies)) {
+                        totalCommentCount += replies.length;
+                    }
+                });
+
+                PostCard.updateCommentCount(postId, totalCommentCount);
+
+                const commentsContainer = PostCard.getCommentsContainer(postId);
+                if (commentsContainer) {
+                    this.renderCommentsInContainer(commentsContainer, commentsArray);
+                }
+            } catch (error) {
+                console.error(`Error loading comments for post ${postId}:`, error);
+                PostCard.updateCommentCount(postId, 0);
+            }
+        }
+
+        await this.reactionManager.loadCommentsLikes();
+        this.commentManager.initializeCommentForms();
+    }
+
+    /**
+     * Render pagination controls
+     */
+    renderPaginationControls() {
+        // Remove existing pagination controls
+        const existingControls = document.querySelector('.pagination-controls');
+        if (existingControls) {
+            existingControls.remove();
+        }
+
+        // Create pagination controls container
+        const paginationContainer = document.createElement('div');
+        paginationContainer.className = 'pagination-controls';
+
+        if (this.hasMorePosts && !this.isLoading) {
+            const loadMoreBtn = document.createElement('button');
+            loadMoreBtn.className = 'load-more-btn';
+            loadMoreBtn.innerHTML = '<i class="fas fa-plus"></i> Load More Posts';
+            loadMoreBtn.addEventListener('click', () => this.loadMorePosts());
+            paginationContainer.appendChild(loadMoreBtn);
+        } else if (this.isLoading) {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'loading-more';
+            loadingDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading more posts...';
+            paginationContainer.appendChild(loadingDiv);
+        } else if (!this.hasMorePosts && this.posts.length > 0) {
+            const endDiv = document.createElement('div');
+            endDiv.className = 'end-of-posts';
+            endDiv.innerHTML = '<i class="fas fa-check"></i> You\'ve reached the end!';
+            paginationContainer.appendChild(endDiv);
+        }
+
+        // Add pagination controls after the post container
+        if (this.postContainer && paginationContainer.children.length > 0) {
+            this.postContainer.parentNode.insertBefore(paginationContainer, this.postContainer.nextSibling);
+        }
+    }
+
+    /**
+     * Load more posts (pagination)
+     */
+    async loadMorePosts() {
+        if (this.isLoading || !this.hasMorePosts) return;
+
+        try {
+            const currentPostCount = this.posts.length;
+            await this.fetchForumPosts(true); // loadMore = true
+
+            // Get only the new posts that were added
+            const newPosts = this.posts.slice(currentPostCount);
+
+            if (newPosts.length > 0) {
+                await this.renderPosts(newPosts, true); // append = true
+            }
+        } catch (error) {
+            console.error('Error loading more posts:', error);
+        }
     }
 
     /**
@@ -194,7 +341,11 @@ export class PostManager {
      * Refresh posts (fetch and render)
      */
     async refreshPosts() {
-        await this.fetchForumPosts();
+        // Reset pagination state
+        this.currentPage = 1;
+        this.hasMorePosts = true;
+
+        await this.fetchForumPosts(false); // loadMore = false (reset)
         await this.renderPosts();
     }
 

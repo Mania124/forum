@@ -749,6 +749,86 @@ img {
     color: var(--primary-color);
 }
 
+/* Pagination Controls */
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 1rem;
+    margin-top: 1rem;
+}
+
+.load-more-btn {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.load-more-btn:hover {
+    background: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.load-more-btn:active {
+    transform: translateY(0);
+}
+
+.loading-more {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--muted-text);
+    font-size: 1rem;
+    padding: 0.75rem 2rem;
+}
+
+.loading-more i {
+    color: var(--accent-color);
+}
+
+.end-of-posts {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--muted-text);
+    font-size: 0.9rem;
+    padding: 0.75rem 2rem;
+    font-style: italic;
+}
+
+.end-of-posts i {
+    color: var(--accent-color);
+}
+
+/* Responsive pagination */
+@media screen and (max-width: 768px) {
+    .pagination-controls {
+        padding: 1.5rem 0.5rem;
+    }
+
+    .load-more-btn {
+        padding: 0.6rem 1.5rem;
+        font-size: 0.9rem;
+    }
+
+    .loading-more,
+    .end-of-posts {
+        font-size: 0.85rem;
+        padding: 0.6rem 1.5rem;
+    }
+}
+
 /* --- Post Header Layout --- */
 .post-header {
     display: flex;
