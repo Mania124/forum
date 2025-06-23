@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # Backend service
+  # Backend service (same as original)
   backend:
     build:
       context: ./backend
@@ -9,7 +9,7 @@ services:
     container_name: forum-backend
     restart: unless-stopped
     ports:
-      - "8080:8080"  # Expose backend port for direct access if needed
+      - "8080:8080"  # Expose backend port
     volumes:
       # Persist uploaded files and database
       - backend_data:/app/static
@@ -27,39 +27,25 @@ services:
       retries: 3
       start_period: 40s
 
-  # Frontend service
+  # Frontend service using serve (like local development)
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
-    container_name: forum-frontend
+      dockerfile: Dockerfile.serve
+    container_name: forum-frontend-serve
     restart: unless-stopped
     ports:
-      - "8000:80"  # Map host port 8000 to nginx port 80
+      - "8000:8000"  # Same port as local development
     depends_on:
       - backend
     networks:
       - forum-network
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8000"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 20s
-
-  # Optional: Database management tool (Adminer)
-  adminer:
-    image: adminer:latest
-    container_name: forum-adminer
-    restart: unless-stopped
-    ports:
-      - "8081:8080"
-    depends_on:
-      - backend
-    networks:
-      - forum-network
-    profiles:
-      - tools  # Only start with --profile tools
 
 # Networks
 networks:

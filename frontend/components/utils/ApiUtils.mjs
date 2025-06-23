@@ -3,7 +3,12 @@
  */
 
 export class ApiUtils {
-    static BASE_URL = 'http://localhost:8080';
+    // Base URL for API calls
+    // For local development and serve-based Docker: use localhost:8080
+    // For nginx-based Docker: use relative URLs (empty string)
+    static BASE_URL = window.location.hostname === 'localhost' && window.location.port === '8000'
+        ? 'http://localhost:8080'
+        : '';
 
     /**
      * Makes a GET request to the API

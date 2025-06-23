@@ -1,0 +1,22 @@
+# Alternative Dockerfile using serve instead of nginx
+# This matches the local development setup more closely
+
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Install serve globally
+RUN npm install -g serve
+
+# Copy frontend source code
+COPY . .
+
+# Expose port 8000 (same as local development)
+EXPOSE 8000
+
+# Start serve with the same options as local development
+# -s flag serves single page applications
+# -l 8000 sets the port to 8000
+# --cors enables CORS for API calls
+CMD ["serve", "-s", ".", "-l", "8000", "--cors"]

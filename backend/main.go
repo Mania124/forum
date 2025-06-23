@@ -30,7 +30,11 @@ func main() {
 	}
 
 	// Initialize the database
-	err := sqlite.InitializeDatabase("forum.db")
+	dbPath := os.Getenv("DB_PATH")
+	if dbPath == "" {
+		dbPath = "forum.db" // fallback default
+	}
+	err := sqlite.InitializeDatabase(dbPath)
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
