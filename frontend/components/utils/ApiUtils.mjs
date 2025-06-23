@@ -3,9 +3,9 @@
  */
 
 export class ApiUtils {
-    // Base URL for API calls - use relative URLs for Docker deployment
-    // nginx will proxy API calls to the backend container
-    // For local development, set FORUM_API_BASE_URL environment variable or use localhost:8080
+    // Base URL for API calls
+    // For local development and serve-based Docker: use localhost:8080
+    // For nginx-based Docker: use relative URLs (empty string)
     static BASE_URL = window.location.hostname === 'localhost' && window.location.port === '8000'
         ? 'http://localhost:8080'
         : '';

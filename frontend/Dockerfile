@@ -21,14 +21,17 @@ RUN mkdir -p /app/dist
 # --- Stage 2: Production Stage with Nginx ---
 FROM nginx:alpine
 
-# Remove default nginx website
-RUN rm -rf /usr/share/nginx/html/*
+# Remove default nginx website and configuration
+RUN rm -rf /usr/share/nginx/html/* && rm -f /etc/nginx/conf.d/default.conf
 
 # Copy frontend files to nginx html directory
 COPY --from=builder /app /usr/share/nginx/html
 
 # Copy custom nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
+
+# Copy custom mime.types that includes .mjs support
+COPY mime.types /etc/nginx/mime.types
 
 # Create log directories
 RUN mkdir -p /var/log/nginx

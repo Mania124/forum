@@ -52,7 +52,13 @@ data/
 
 # Static files that will be uploaded at runtime
 static/pictures/*
+static/profiles/*
 !static/pictures/.gitkeep
+!static/profiles/.gitkeep
+# Allow essential static assets for Docker build
+!static/pictures/forum-logo.png
+!static/pictures/icons8-avatar.gif
+!static/profiles/default.png
 
 # Temporary files
 tmp/

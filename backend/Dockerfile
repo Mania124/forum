@@ -13,6 +13,9 @@
     
     # Copy application source code
     COPY . .
+
+    # Ensure static assets exist in builder stage
+    RUN ls -la static/pictures/ || echo "Static directory not found"
     
     # Set CGO enabled for sqlite
     ENV CGO_ENABLED=1
@@ -26,22 +29,31 @@
     # Install required dependencies (sqlite for database support)
     RUN apk --no-cache add sqlite
     
-    # Install dependencies for serving static files (e.g., to create necessary directories)
-    RUN mkdir -p /app/static && \
-        chmod -R 777 /app/static
-    
+    # Create static directories with proper permissions
+    RUN mkdir -p /app/static/pictures /app/static/profiles
+    RUN chmod -R 755 /app/static
+
     # Set working directory inside container
     WORKDIR /app
-    
+
     # Copy the built binary from the builder stage
     COPY --from=builder /app/forum-server /app/
     COPY --from=builder /app/schema.sql /app/
-    # Copy static files if you have any pre-existing static content in the project
-    # COPY ./static /app/static
-    
+
+    # Copy essential static assets (forum logo and default avatar)
+    COPY --from=builder /app/static/pictures/forum-logo.png /app/static/pictures/
+    COPY --from=builder /app/static/pictures/icons8-avatar.gif /app/static/pictures/
+    COPY --from=builder /app/static/profiles/default.png /app/static/profiles/
+
+    # Ensure proper permissions for static files
+    RUN chmod -R 755 /app/static
+
+    # Create data directory for database
+    RUN mkdir -p /app/data && chmod -R 755 /app/data
+
     # Expose port (match the port used in `main.go`)
     EXPOSE 8080
-    
+
     # Start the server
     CMD ["/app/forum-server"]
      

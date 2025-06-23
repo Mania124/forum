@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # Backend service (same as original)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: forum-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"  # Expose backend port
+    volumes:
+      # Persist uploaded files and database
+      - backend_data:/app/static
+      - database_data:/app/data
+    environment:
+      - PORT=8080
+      - DB_PATH=/app/data/forum.db
+      - FRONTEND_ORIGIN=http://localhost:8000
+    networks:
+      - forum-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/api/categories"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend service using serve (like local development)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.serve
+    container_name: forum-frontend-serve
+    restart: unless-stopped
+    ports:
+      - "8000:8000"  # Same port as local development
+    depends_on:
+      - backend
+    networks:
+      - forum-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+# Networks
+networks:
+  forum-network:
+    driver: bridge
+    name: forum-internal
+
+# Volumes for data persistence
+volumes:
+  backend_data:
+    name: forum-backend-data
+    driver: local
+  database_data:
+    name: forum-database-data
+    driver: local

@@ -118,7 +118,7 @@ CREATE TABLE IF NOT EXISTS categories (
 );
 
 
--- BEGIN TRANSACTION;
+BEGIN TRANSACTION;
 
 -- -- Insert sample users (with UUIDs)
 -- INSERT INTO users (id, username, email, password_hash, avatar_url) VALUES
@@ -198,19 +198,19 @@ CREATE TABLE IF NOT EXISTS categories (
 -- ('71caaa69-9ae5-46e7-b77c-335bf371c6a9', NULL, 9, 'dislike'),
 -- ('014b3423-b8a2-4129-ba20-85efea98e119', NULL, 10, 'like');
 
--- -- Insert sample categories
+-- Insert sample categories
 
--- INSERT INTO categories (name) VALUES
--- ('Web Development'),
--- ('Mobile Development'),
--- ('Data Science'),
--- ('DevOps'),
--- ('Cybersecurity'),
--- ('Artificial Intelligence'),
--- ('Software Architecture'),
--- ('Game Development'),
--- ('Cloud Computing'),
--- ('Blockchain');
+INSERT OR IGNORE INTO categories (name) VALUES
+('Web Development'),
+('Mobile Development'),
+('Data Science'),
+('DevOps'),
+('Cybersecurity'),
+('Artificial Intelligence'),
+('Software Architecture'),
+('Game Development'),
+('Cloud Computing'),
+('Blockchain');
 
 -- -- Insert post-category associations
 -- INSERT INTO post_categories (post_id, category_id) VALUES
@@ -238,5 +238,5 @@ CREATE TABLE IF NOT EXISTS categories (
 -- ('71caaa69-9ae5-46e7-b77c-335bf371c6a9', 9, 'Security is often overlooked in smart contracts.'),
 -- ('014b3423-b8a2-4129-ba20-85efea98e119', 10, 'Good point about quoting. CSS selectors can be picky.');
 
--- COMMIT;
+COMMIT;
 

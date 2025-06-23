@@ -1,8 +1,12 @@
 #!/bin/bash
 
 # Simple script to build and start the forum containers
+# Usage: ./start-forum.sh [nginx|serve]
+# Default: nginx
 
-echo "🚀 Starting Forum Application..."
+FRONTEND_TYPE=${1:-nginx}
+
+echo "🚀 Starting Forum Application with $FRONTEND_TYPE frontend..."
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -32,10 +36,20 @@ fi
 # Stop any existing containers
 print_info "Stopping any existing containers..."
 docker-compose down > /dev/null 2>&1
+docker-compose -f docker-compose.serve.yml down > /dev/null 2>&1
+
+# Choose the right docker-compose file
+if [ "$FRONTEND_TYPE" = "serve" ]; then
+    COMPOSE_FILE="docker-compose.serve.yml"
+    print_info "Using serve-based frontend (like local development)"
+else
+    COMPOSE_FILE="docker-compose.yml"
+    print_info "Using nginx-based frontend (production-like)"
+fi
 
 # Build containers
 print_info "Building containers..."
-if docker-compose build; then
+if docker-compose -f $COMPOSE_FILE build; then
     print_success "Containers built successfully"
 else
     print_error "Failed to build containers"
@@ -44,7 +58,7 @@ fi
 
 # Start containers
 print_info "Starting containers..."
-if docker-compose up -d; then
+if docker-compose -f $COMPOSE_FILE up -d; then
     print_success "Containers started successfully"
 else
     print_error "Failed to start containers"
@@ -74,11 +88,15 @@ fi
 
 # Show container status
 print_info "Container status:"
-docker-compose ps
+docker-compose -f $COMPOSE_FILE ps
 
 echo ""
 print_success "Forum application is ready!"
 echo "🌐 Access the application at: http://localhost:8000"
 echo "🔧 Backend API available at: http://localhost:8080"
 echo ""
-echo "To stop the application, run: docker-compose down"
+if [ "$FRONTEND_TYPE" = "serve" ]; then
+    echo "To stop the application, run: docker-compose -f docker-compose.serve.yml down"
+else
+    echo "To stop the application, run: docker-compose down"
+fi
