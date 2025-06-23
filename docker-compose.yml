@@ -17,6 +17,7 @@ services:
     environment:
       - PORT=8080
       - DB_PATH=/app/data/forum.db
+      - FRONTEND_ORIGIN=http://localhost:8000
     networks:
       - forum-network
     healthcheck:
@@ -34,7 +35,7 @@ services:
     container_name: forum-frontend
     restart: unless-stopped
     ports:
-      - "8000:80"  # Main application port
+      - "8000:80"  # Map host port 8000 to nginx port 80
     depends_on:
       - backend
     networks:
