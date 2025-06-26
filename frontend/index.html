@@ -21,6 +21,30 @@
 </head>
 <body>
     <div class="main-container">
+        <!-- Mobile Navigation Elements -->
+        <div class="hamburger-menu" aria-label="Toggle sidebar menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <div class="mobile-category-dropdown">
+            <button class="category-dropdown-btn" aria-label="Category filter">
+                <i class="fas fa-tags"></i>
+                <span>Categories</span>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="category-dropdown-content">
+                <div class="category-item active" data-category="all">
+                    <i class="fas fa-globe"></i> All Posts
+                </div>
+                <!-- Additional categories will be loaded dynamically -->
+            </div>
+        </div>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay"></div>
+
         <!-- Navbar -->
         <nav class="navbar" role="navigation" aria-label="Main navigation">
             <div id="navLogoContainer"></div>
