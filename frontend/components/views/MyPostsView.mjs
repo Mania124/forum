@@ -4,7 +4,7 @@
 
 import { BaseView } from './BaseView.mjs';
 
-export class SavedView extends BaseView {
+export class MyPostsView extends BaseView {
     constructor(app, params, query) {
         super(app, params, query);
     }
@@ -49,22 +49,16 @@ export class SavedView extends BaseView {
         container.innerHTML = '';
 
         const savedContent = document.createElement('div');
-        savedContent.className = 'saved-view';
+        savedContent.className = 'my-posts-view';
         savedContent.innerHTML = `
-            <div class="saved-header">
-                <h1><i class="fas fa-bookmark"></i> Saved Posts</h1>
-                <p>Posts you've bookmarked for later</p>
+            <div class="my-posts-header">
+                <h1>My Posts</h1>
+                <p>All your created posts are listed here.</p>
             </div>
 
-            <div class="saved-filters">
-                <button class="filter-btn active" data-filter="all">All Saved</button>
-                <button class="filter-btn" data-filter="recent">Recently Saved</button>
-                <button class="filter-btn" data-filter="category">By Category</button>
-            </div>
-
-            <div class="saved-content">
-                <div class="saved-posts" id="savedPosts">
-                    <div class="loading">Loading your saved posts...</div>
+            <div class="my-posts-content">
+                <div class="created-posts" id="myPosts">
+                    <div class="loading">Loading your posts...</div>
                 </div>
             </div>
         `;
@@ -75,7 +69,7 @@ export class SavedView extends BaseView {
         this.setupEventListeners();
 
         // Load saved posts
-        await this.loadSavedPosts('all');
+        await this.loadMyPosts('all');
     }
 
     /**
@@ -93,7 +87,7 @@ export class SavedView extends BaseView {
                 btn.classList.add('active');
                 
                 // Load filtered data
-                this.loadSavedPosts(filter);
+                this.loadMyPosts(filter);
             });
         });
     }
@@ -102,26 +96,25 @@ export class SavedView extends BaseView {
      * Load saved posts
      * @param {string} filter - Filter type
      */
-    async loadSavedPosts(filter) {
-        const postsContainer = document.getElementById('savedPosts');
+    async loadMyPosts(filter) {
+        const postsContainer = document.getElementById('myPosts');
         if (!postsContainer) return;
 
         try {
-            postsContainer.innerHTML = '<div class="loading">Loading your saved posts...</div>';
+            postsContainer.innerHTML = '<div class="loading">Loading your  posts...</div>';
 
             // This would typically fetch saved posts from the API
             // For now, we'll show a placeholder since saved posts functionality isn't implemented yet
             postsContainer.innerHTML = `
                 <div class="empty-state">
-                    <i class="fas fa-bookmark"></i>
-                    <h3>No Saved Posts Yet</h3>
-                    <p>Start bookmarking posts you want to read later!</p>
-                    <button class="browse-posts-btn">Browse Posts</button>
+                    <h3>No Posts Yet</h3>
+                    <p>Start Creating Your Own Posts!</p>
+                    <button class="create-posts-btn">Create Posts</button>
                 </div>
             `;
 
             // Add event listener for browse button
-            const browseBtn = postsContainer.querySelector('.browse-posts-btn');
+            const browseBtn = postsContainer.querySelector('.create-posts-btn');
             if (browseBtn) {
                 browseBtn.addEventListener('click', () => {
                     this.app.router.navigate('/');
@@ -129,11 +122,11 @@ export class SavedView extends BaseView {
             }
 
         } catch (error) {
-            console.error('Error loading saved posts:', error);
+            console.error('Error loading your created posts:', error);
             postsContainer.innerHTML = '';
             postsContainer.appendChild(this.createErrorElement(
-                'Failed to load saved posts.',
-                () => this.loadSavedPosts(filter)
+                'Failed to load your posts.',
+                () => this.loadMyPosts(filter)
             ));
         }
     }
@@ -148,7 +141,7 @@ export class SavedView extends BaseView {
             console.log(`Removing saved post ${postId}`);
             
             // Refresh the saved posts list
-            await this.loadSavedPosts('all');
+            await this.loadMyPosts('all');
             
         } catch (error) {
             console.error('Error removing saved post:', error);
