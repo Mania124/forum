@@ -3558,14 +3558,14 @@ body.modal-open {
     overflow: hidden;
 }
 
-.saved-header {
+.my-posts-header {
     padding: 2rem;
     background: #1d5c7e;
     color: white;
     text-align: center;
 }
 
-.saved-header h1 {
+.my-posts-header h1 {
     margin-bottom: 0.5rem;
 }
 
