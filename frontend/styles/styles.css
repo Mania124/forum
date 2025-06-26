@@ -3506,22 +3506,29 @@ body.modal-open {
 }
 
 .category-header {
-    display: flex;
+    display: block;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
     padding: 2rem;
     background:#1d5c7e;
     color: white;
 }
 
+.category-info {
+    text-align:  center;
+}
+
+
 .category-info h1 {
     margin-bottom: 0.5rem;
     font-size: 2rem;
+    text-align: center;
 }
 
 .category-info p {
     opacity: 0.9;
     font-size: 1.1rem;
+    text-align: center;
 }
 
 
