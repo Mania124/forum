@@ -56,6 +56,12 @@ export class MyPostsView extends BaseView {
                 <p>All your created posts are listed here.</p>
             </div>
 
+            <div class="my-posts-filters">
+                <button class="filter-btn active" data-filter="all">All Posts</button>
+                <button class="filter-btn" data-filter="recent">Recent</button>
+                <button class="filter-btn" data-filter="popular">Popular</button>
+            </div>
+
             <div class="my-posts-content">
                 <div class="created-posts" id="myPosts">
                     <div class="loading">Loading your posts...</div>
@@ -101,25 +107,67 @@ export class MyPostsView extends BaseView {
         if (!postsContainer) return;
 
         try {
-            postsContainer.innerHTML = '<div class="loading">Loading your  posts...</div>';
+            postsContainer.innerHTML = '<div class="loading">Loading your posts...</div>';
 
-            // This would typically fetch my posts from the API
-            // For now, we'll show a placeholder since my posts functionality isn't implemented yet
-            postsContainer.innerHTML = `
-                <div class="empty-state">
-                    <h3>No Posts Yet</h3>
-                    <p>Start Creating Your Own Posts!</p>
-                    <button class="btn-primary create-posts-btn">Create Posts</button>
-                </div>
-            `;
-
-            // Add event listener for browse button
-            const browseBtn = postsContainer.querySelector('.create-posts-btn');
-            if (browseBtn) {
-                browseBtn.addEventListener('click', () => {
-                    this.app.router.navigate('/');
-                });
+            // Get current user
+            const currentUser = this.app.authManager.getCurrentUser();
+            if (!currentUser) {
+                throw new Error('User not authenticated');
             }
+
+            // Fetch all posts and filter by current user
+            const allPosts = await this.app.postManager.fetchForumPosts();
+
+            // Filter posts by current user's ID
+            const myPosts = allPosts.filter(post => post.user_id === currentUser.id);
+
+            // Apply additional filtering if needed
+            let filteredPosts = myPosts;
+            if (filter === 'recent') {
+                filteredPosts = myPosts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            } else if (filter === 'popular') {
+                // Sort by likes/reactions if available
+                filteredPosts = myPosts.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+            }
+
+            postsContainer.innerHTML = '';
+
+            if (filteredPosts.length === 0) {
+                postsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No Posts Yet</h3>
+                        <p>Start Creating Your Own Posts!</p>
+                        <button class="btn-primary create-posts-btn">Create Posts</button>
+                    </div>
+                `;
+
+                // Add event listener for create button
+                const createBtn = postsContainer.querySelector('.create-posts-btn');
+                if (createBtn) {
+                    createBtn.addEventListener('click', () => {
+                        this.app.router.navigate('/');
+                    });
+                }
+                return;
+            }
+
+            // Render posts using PostCard component
+            for (const post of filteredPosts) {
+                // Import PostCard dynamically
+                const { PostCard } = await import('../posts/PostCard.mjs');
+                const postCard = PostCard.create(post);
+
+                // Add my-posts specific styling
+                postCard.classList.add('my-post-card');
+
+                // Setup comment toggle for this post
+                PostCard.setupCommentToggle(postCard);
+
+                postsContainer.appendChild(postCard);
+            }
+
+            // Load additional data for posts (reactions, etc.)
+            await this.loadPostsData(filteredPosts);
 
         } catch (error) {
             console.error('Error loading your created posts:', error);
@@ -132,6 +180,28 @@ export class MyPostsView extends BaseView {
     }
 
     /**
+     * Load additional data for posts (reactions, comments count)
+     * @param {Array} posts - Posts to load data for
+     */
+    async loadPostsData(posts) {
+        try {
+            // Load reactions for all posts
+            await this.app.getReactionManager().loadPostsLikes();
+
+            // Update comment counts for all posts
+            for (const post of posts) {
+                try {
+                    await this.app.postManager.updatePostComments(post.id);
+                } catch (error) {
+                    console.error(`Error updating comments for post ${post.id}:`, error);
+                }
+            }
+        } catch (error) {
+            console.error('Error loading posts data:', error);
+        }
+    }
+
+    /**
      * Remove post from my posts list
      * @param {number} postId - Post ID to remove
      */
@@ -139,10 +209,10 @@ export class MyPostsView extends BaseView {
         try {
             // This would typically make an API call to remove the my post
             console.log(`Removing my post ${postId}`);
-            
+
             // Refresh the my posts list
             await this.loadMyPosts('all');
-            
+
         } catch (error) {
             console.error('Error removing my post:', error);
             alert('Failed to remove my post.');
