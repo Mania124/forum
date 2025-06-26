@@ -83,9 +83,9 @@ export class NotFoundView extends BaseView {
                             <i class="fas fa-user"></i>
                             <span>Your Profile</span>
                         </a>
-                        <a href="/saved" class="suggestion-link">
-                            <i class="fas fa-bookmark"></i>
-                            <span>Saved Posts</span>
+                        <a href="/myposts" class="suggestion-link">
+                            <i class="fa-regular fa-note-sticky"></i>
+                            <span>My Posts</span>
                         </a>
                     </div>
                 </div>
