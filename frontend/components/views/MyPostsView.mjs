@@ -201,21 +201,5 @@ export class MyPostsView extends BaseView {
         }
     }
 
-    /**
-     * Remove post from my posts list
-     * @param {number} postId - Post ID to remove
-     */
-    async removeMyPost(postId) {
-        try {
-            // This would typically make an API call to remove the my post
-            console.log(`Removing my post ${postId}`);
 
-            // Refresh the my posts list
-            await this.loadMyPosts('all');
-
-        } catch (error) {
-            console.error('Error removing my post:', error);
-            alert('Failed to remove my post.');
-        }
-    }
 }
