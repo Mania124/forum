@@ -198,8 +198,8 @@ export class NavManager {
                 case 'trending':
                     this.router.navigate('/trending');
                     break;
-                case 'saved':
-                    this.router.navigate('/saved');
+                case 'myposts':
+                    this.router.navigate('/myposts');
                     break;
                 default:
                     console.warn(`Unknown view: ${view}`);
