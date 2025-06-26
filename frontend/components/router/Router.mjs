@@ -58,10 +58,10 @@ export class Router {
             requiresAuth: false
         });
         
-        this.routes.set('/saved', {
-            name: 'saved',
-            component: 'SavedView',
-            title: 'Forum - Saved Posts',
+        this.routes.set('/myposts', {
+            name: 'myposts',
+            component: 'MyPostsView',
+            title: 'Forum - My Posts',
             requiresAuth: true
         });
         
@@ -200,7 +200,7 @@ export class Router {
             /^\/home$/,                      // /home
             /^\/profile$/,                   // /profile
             /^\/trending$/,                  // /trending
-            /^\/saved$/,                     // /saved
+            /^\/myposts$/,                     // /myposts
             /^\/post\/[^\/]+$/,             // /post/{id}
             /^\/category\/[^\/]+$/,         // /category/{id}
         ];
