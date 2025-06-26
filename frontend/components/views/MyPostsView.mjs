@@ -1,5 +1,5 @@
 /**
- * Saved View - Shows user's saved posts
+ * My Posts View - Shows user's created posts
  */
 
 import { BaseView } from './BaseView.mjs';
@@ -10,7 +10,7 @@ export class MyPostsView extends BaseView {
     }
 
     /**
-     * Render the saved view
+     * Render the my posts view
      * @param {HTMLElement} container - Container element
      */
     async render(container) {
@@ -28,29 +28,29 @@ export class MyPostsView extends BaseView {
             // Show loading state
             container.appendChild(this.createLoadingElement());
 
-            // Create saved view
-            await this.renderSavedContent(container);
+            // Create my posts view
+            await this.renderMyPostsContent(container);
 
         } catch (error) {
-            console.error('Error rendering saved view:', error);
+            console.error('Error rendering my posts view:', error);
             container.innerHTML = '';
             container.appendChild(this.createErrorElement(
-                'Failed to load saved posts.',
+                'Failed to load my posts.',
                 () => this.render(container)
             ));
         }
     }
 
     /**
-     * Render saved content
+     * Render my posts content
      * @param {HTMLElement} container - Container element
      */
-    async renderSavedContent(container) {
+    async renderMyPostsContent(container) {
         container.innerHTML = '';
 
-        const savedContent = document.createElement('div');
-        savedContent.className = 'my-posts-view';
-        savedContent.innerHTML = `
+        const myPostsContent = document.createElement('div');
+        myPostsContent.className = 'my-posts-view';
+        myPostsContent.innerHTML = `
             <div class="my-posts-header">
                 <h1>My Posts</h1>
                 <p>All your created posts are listed here.</p>
@@ -63,12 +63,12 @@ export class MyPostsView extends BaseView {
             </div>
         `;
 
-        container.appendChild(savedContent);
+        container.appendChild(myPostsContent);
 
         // Setup event listeners
         this.setupEventListeners();
 
-        // Load saved posts
+        // Load my posts
         await this.loadMyPosts('all');
     }
 
@@ -93,7 +93,7 @@ export class MyPostsView extends BaseView {
     }
 
     /**
-     * Load saved posts
+     * Load my posts
      * @param {string} filter - Filter type
      */
     async loadMyPosts(filter) {
@@ -103,13 +103,13 @@ export class MyPostsView extends BaseView {
         try {
             postsContainer.innerHTML = '<div class="loading">Loading your  posts...</div>';
 
-            // This would typically fetch saved posts from the API
-            // For now, we'll show a placeholder since saved posts functionality isn't implemented yet
+            // This would typically fetch my posts from the API
+            // For now, we'll show a placeholder since my posts functionality isn't implemented yet
             postsContainer.innerHTML = `
                 <div class="empty-state">
                     <h3>No Posts Yet</h3>
                     <p>Start Creating Your Own Posts!</p>
-                    <button class="create-posts-btn">Create Posts</button>
+                    <button class="btn-primary create-posts-btn">Create Posts</button>
                 </div>
             `;
 
@@ -132,20 +132,20 @@ export class MyPostsView extends BaseView {
     }
 
     /**
-     * Remove post from saved list
+     * Remove post from my posts list
      * @param {number} postId - Post ID to remove
      */
-    async removeSavedPost(postId) {
+    async removeMyPost(postId) {
         try {
-            // This would typically make an API call to remove the saved post
-            console.log(`Removing saved post ${postId}`);
+            // This would typically make an API call to remove the my post
+            console.log(`Removing my post ${postId}`);
             
-            // Refresh the saved posts list
+            // Refresh the my posts list
             await this.loadMyPosts('all');
             
         } catch (error) {
-            console.error('Error removing saved post:', error);
-            alert('Failed to remove saved post.');
+            console.error('Error removing my post:', error);
+            alert('Failed to remove my post.');
         }
     }
 }
