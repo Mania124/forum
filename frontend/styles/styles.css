@@ -596,7 +596,7 @@ img {
 
 
 /* ===== Post Card ===== */
-.post-card {
+.post-card, .my-post-card {
     background: var(--primary-color);
     border-radius: var(--radius);
     padding: 1rem; 
@@ -609,7 +609,7 @@ img {
     position: relative;
 }
 
-.post-card:hover {
+.post-card:hover, .my-post-card:hover {
     /* transform: translateY(-2px); */
     box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.2); /* Slightly more lift */
 }
@@ -3574,7 +3574,7 @@ body.modal-open {
     margin-bottom: 0.5rem;
 }
 
-.saved-filters {
+.my-posts-filters {
     display: flex;
     justify-content: center;
     gap: 1rem;
@@ -3582,20 +3582,16 @@ body.modal-open {
     border-bottom: 1px solid var(--border-color);
 }
 
-.saved-content {
+.my-posts-content {
     padding: 2rem;
 }
 
-.browse-posts-btn {
-    background: var(--accent-color);
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: var(--radius);
-    cursor: pointer;
-    font-weight: 500;
-    margin-top: 1rem;
+.created-posts {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
+
 
 /* 404 Not Found View */
 .not-found-view {
