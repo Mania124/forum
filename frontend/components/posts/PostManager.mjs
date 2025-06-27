@@ -326,15 +326,26 @@ export class PostManager {
      * @param {number} categoryId - Category ID (0 for all)
      */
     async filterPostsByCategory(categoryId) {
+        console.log('PostManager: filterPostsByCategory called with categoryId:', categoryId);
+        console.log('PostManager: Total posts available:', this.posts.length);
+
         if (categoryId === 0) {
             this.filteredPosts = this.posts;
+            console.log('PostManager: Showing all posts:', this.filteredPosts.length);
         } else {
-            this.filteredPosts = this.posts.filter(post => 
-                post.category_ids && post.category_ids.includes(categoryId)
-            );
+            this.filteredPosts = this.posts.filter(post => {
+                const hasCategory = post.category_ids && post.category_ids.includes(categoryId);
+                if (hasCategory) {
+                    console.log('PostManager: Post matches category:', post.title, 'categories:', post.category_ids);
+                }
+                return hasCategory;
+            });
+            console.log('PostManager: Filtered posts for category', categoryId + ':', this.filteredPosts.length);
         }
 
+        console.log('PostManager: Rendering filtered posts...');
         await this.renderPosts(this.filteredPosts);
+        console.log('PostManager: Filtering complete');
     }
 
     /**
