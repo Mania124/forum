@@ -66,25 +66,51 @@ export class CategoryManager {
                 console.log('CategoryManager: Category clicked:', catId);
 
                 try {
+                    console.log('CategoryManager: Desktop category clicked, catId:', catId);
+
                     // Scroll to top smoothly
                     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-                    // Use router for navigation if available
-                    if (this.router) {
-                        if (catId === 0) {
-                            // Navigate to home for "All" categories
-                            console.log('CategoryManager: Navigating to home (all categories)');
-                            this.router.navigate('/');
-                        } else {
-                            // Navigate to category-specific route
-                            console.log('CategoryManager: Navigating to category:', catId);
-                            this.router.navigate(`/category/${catId}`);
+                    // Check if we're on the homepage, if not navigate there first
+                    const currentPath = window.location.pathname;
+                    const isOnHomepage = currentPath === '/' || currentPath === '/home';
+
+                    if (!isOnHomepage) {
+                        // Navigate to homepage with category filter
+                        console.log('CategoryManager: Not on homepage, navigating to home with category filter');
+                        if (this.router) {
+                            const newUrl = catId === 0 ? '/' : `/?category=${catId}`;
+                            console.log('CategoryManager: Navigating to:', newUrl);
+                            this.router.navigate(newUrl);
                         }
                     } else {
-                        // Fallback to callback approach for backward compatibility
-                        console.log('CategoryManager: Using callback approach');
-                        if (this.onCategoryFilter) {
-                            await this.onCategoryFilter(catId);
+                        // We're already on homepage, use direct filtering
+                        console.log('CategoryManager: On homepage, attempting direct post filtering');
+                        if (this.router && this.router.app && this.router.app.postManager) {
+                            console.log('CategoryManager: Calling postManager.filterPostsByCategory with:', catId);
+                            await this.router.app.postManager.filterPostsByCategory(catId);
+
+                            // Update URL for consistency
+                            const newUrl = catId === 0 ? '/' : `/?category=${catId}`;
+                            console.log('CategoryManager: Updating URL to:', newUrl);
+                            window.history.pushState({}, '', newUrl);
+
+                            // Update active category state
+                            this.updateActiveCategory(catId);
+                        } else {
+                            // Fallback to router navigation
+                            console.log('CategoryManager: Using router navigation fallback');
+                            if (this.router) {
+                                const newUrl = catId === 0 ? '/' : `/?category=${catId}`;
+                                console.log('CategoryManager: Navigating to:', newUrl);
+                                this.router.navigate(newUrl);
+                            } else {
+                                // Fallback to callback approach for backward compatibility
+                                console.log('CategoryManager: Using callback approach');
+                                if (this.onCategoryFilter) {
+                                    await this.onCategoryFilter(catId);
+                                }
+                            }
                         }
                     }
                 } catch (error) {

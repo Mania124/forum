@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,6 +22,30 @@
 </head>
 <body>
     <div class="main-container">
+        <!-- Mobile Navigation Elements -->
+        <div class="hamburger-menu" aria-label="Toggle sidebar menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <div class="mobile-category-dropdown">
+            <button class="category-dropdown-btn" aria-label="Category filter">
+                <i class="fas fa-tags"></i>
+                <span>Categories</span>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="category-dropdown-content">
+                <div class="category-item active" data-category="all">
+                    <i class="fas fa-globe"></i> All Posts
+                </div>
+                <!-- Additional categories will be loaded dynamically -->
+            </div>
+        </div>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay"></div>
+
         <!-- Navbar -->
         <nav class="navbar" role="navigation" aria-label="Main navigation">
             <div id="navLogoContainer"></div>
@@ -43,8 +68,18 @@
                     <div class="menu-item active" data-view="home"><i class="fas fa-home"></i> Home</div>
                     <div class="menu-item" data-view="profile"><i class="fas fa-user"></i> Profile</div>
                     <div class="menu-item" data-view="trending"><i class="fas fa-fire"></i> Trending</div>
-                    <div class="menu-item" data-view="myposts"><i class="fa fa-sticky-note"></i>My Posts</div>
+                    <div class="menu-item" data-view="myposts"><i class="fa fa-sticky-note"></i> My Posts</div>
+                    <div class="menu-item" data-view="saved"><i class="fas fa-bookmark"></i> Saved Posts</div>
+                    <div class="menu-item" data-view="liked"><i class="fas fa-heart"></i> Liked Posts</div>
                 </nav>
+
+                <!-- Category Section for Desktop -->
+                <section class="category-section" id="categorySection">
+                    <h3>Categories</h3>
+                    <div id="categoryList">
+                        <!-- Categories will be loaded here -->
+                    </div>
+                </section>
             </aside>
 
             <!-- Main Content -->

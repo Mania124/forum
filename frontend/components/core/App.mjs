@@ -5,6 +5,7 @@ import { setupRouter } from '../router/Router.mjs';
 import { AuthManager } from '../auth/AuthManager.mjs';
 import { AuthModal } from '../auth/AuthModal.mjs';
 import { NavManager } from '../navigation/NavManager.mjs';
+import { MobileNavManager } from '../navigation/MobileNavManager.mjs';
 import { CategoryManager } from '../categories/CategoryManager.mjs';
 import { ReactionManager } from '../reactions/ReactionManager.mjs';
 import { PostManager } from '../posts/PostManager.mjs';
@@ -16,6 +17,7 @@ export class App {
         this.authManager = null;
         this.authModal = null;
         this.navManager = null;
+        this.mobileNavManager = null;
         this.categoryManager = null;
         this.reactionManager = null;
         this.postManager = null;
@@ -37,7 +39,10 @@ export class App {
             
             // Initialize navigation
             this.navManager = new NavManager(this.authManager, this.authModal);
-            
+
+            // Initialize mobile navigation
+            this.mobileNavManager = new MobileNavManager(this);
+
             // Initialize category manager with filter callback
             this.categoryManager = new CategoryManager((categoryId) => this.onCategoryFilter(categoryId));
             
