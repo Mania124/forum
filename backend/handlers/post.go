@@ -151,7 +151,46 @@ func GetPosts(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 			utils.SendJSONError(w, "Failed to fetch post user information", http.StatusInternalServerError)
 			return
 		}
-		post.ProfileAvatar = userInfo.AvatarURL 
+		post.ProfileAvatar = userInfo.AvatarURL
+		fullPosts = append(fullPosts, post)
+	}
+
+	utils.SendJSONResponse(w, fullPosts, http.StatusOK)
+}
+
+// GetLikedPosts fetches posts liked by the current user
+func GetLikedPosts(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Get user ID from session
+	userID, err := utils.GetUserIDFromSession(db, r)
+	if err != nil || userID == "" {
+		utils.SendJSONError(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	// Extract pagination parameters from the URL query
+	page, limit := utils.GetPaginationParams(r)
+
+	// Fetch posts liked by the user
+	posts, err := sqlite.GetPostsLikedByUser(db, userID, page, limit)
+	if err != nil {
+		utils.SendJSONError(w, "Failed to fetch liked posts", http.StatusInternalServerError)
+		return
+	}
+
+	var fullPosts []models.Post
+
+	for _, post := range posts {
+		userInfo, err := sqlite.GetUserByID(db, post.UserID)
+		if err != nil {
+			utils.SendJSONError(w, "Failed to fetch post user information", http.StatusInternalServerError)
+			return
+		}
+		post.ProfileAvatar = userInfo.AvatarURL
 		fullPosts = append(fullPosts, post)
 	}
 
@@ -272,7 +311,7 @@ func GetPostComments(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 			utils.SendJSONError(w, "Failed to fetch comment user information", http.StatusInternalServerError)
 			return
 		}
-		comment.UserName =userInfo.Username
+		comment.UserName = userInfo.Username
 		comment.ProfileAvatar = userInfo.AvatarURL
 
 		fullComments = append(fullComments, comment)
