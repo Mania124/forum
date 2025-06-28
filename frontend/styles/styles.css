@@ -3672,7 +3672,7 @@ body.modal-open {
 }
 
 .explore-btn {
-    background: var(--primary-color);
+    background: var(--nav-bar-color);
     color: white;
     border: none;
     padding: 12px 24px;
@@ -3687,8 +3687,8 @@ body.modal-open {
 }
 
 .explore-btn:hover {
-    background: var(--primary-hover);
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     color: white;
     text-decoration: none;
 }

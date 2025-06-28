@@ -141,9 +141,7 @@ export class LikedPostsView extends BaseView {
                         </div>
                         <h3>No liked posts yet</h3>
                         <p>Posts you like will appear here. Start exploring and like some posts!</p>
-                        <button class="explore-btn" onclick="window.location.href='/'">
-                            <i class="fas fa-compass"></i> Explore Posts
-                        </button>
+                        <button class="explore-btn" onclick="window.location.href='/'"><i class="fas fa-compass"></i> Explore Posts</button>
                     </div>
                 `;
                 return;
