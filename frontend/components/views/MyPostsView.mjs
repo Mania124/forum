@@ -52,7 +52,7 @@ export class MyPostsView extends BaseView {
         myPostsContent.className = 'my-posts-view';
         myPostsContent.innerHTML = `
             <div class="my-posts-header">
-                <h1>My Posts</h1>
+                <h1><i class="fas fa-folder"></i> My Posts</h1>
                 <p>All your created posts are listed here.</p>
             </div>
 
