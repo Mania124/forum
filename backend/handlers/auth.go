@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"forum/models"
 	"forum/sqlite"
 	"forum/utils"
 )
@@ -159,6 +160,7 @@ func LoginUser(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 
 	var credentials struct {
 		Email    string `json:"email"`
+		Username string `json:"username"`
 		Password string `json:"password"`
 	}
 
@@ -172,33 +174,68 @@ func LoginUser(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Validate and sanitize email
-	sanitizedEmail, err := utils.ValidateAndSanitizeString(credentials.Email, 100, "email")
-	if err != nil {
-		utils.SendJSONError(w, "Invalid email format", http.StatusBadRequest)
+	// Check if either email or username is provided
+	if credentials.Email == "" && credentials.Username == "" {
+		utils.SendJSONError(w, "Email or username is required", http.StatusBadRequest)
 		return
 	}
 
-	// Additional email format validation
-	if err := utils.ValidateEmail(sanitizedEmail); err != nil {
-		utils.SendJSONError(w, "Invalid email format", http.StatusBadRequest)
-		return
-	}
+	var user models.User
 
-	// Get user from DB
-	user, err := sqlite.GetUserByEmail(db, sanitizedEmail)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			utils.SendJSONError(w, "Invalid email or password", http.StatusUnauthorized)
+	// Try to get user by email first, then by username
+	if credentials.Email != "" {
+		// Validate and sanitize email
+		sanitizedEmail, err := utils.ValidateAndSanitizeString(credentials.Email, 100, "email")
+		if err != nil {
+			utils.SendJSONError(w, "Invalid email format", http.StatusBadRequest)
 			return
 		}
-		utils.SendJSONError(w, "Database error", http.StatusInternalServerError)
-		return
+
+		// Additional email format validation
+		if err := utils.ValidateEmail(sanitizedEmail); err != nil {
+			utils.SendJSONError(w, "Invalid email format", http.StatusBadRequest)
+			return
+		}
+
+		// Get user from DB by email
+		user, err = sqlite.GetUserByEmail(db, sanitizedEmail)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				utils.SendJSONError(w, "Invalid credentials", http.StatusUnauthorized)
+				return
+			}
+			utils.SendJSONError(w, "Database error", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		// Validate and sanitize username
+		sanitizedUsername, err := utils.ValidateAndSanitizeString(credentials.Username, 30, "username")
+		if err != nil {
+			utils.SendJSONError(w, "Invalid username format", http.StatusBadRequest)
+			return
+		}
+
+		// Additional username format validation
+		if err := utils.ValidateUsername(sanitizedUsername); err != nil {
+			utils.SendJSONError(w, "Invalid username format", http.StatusBadRequest)
+			return
+		}
+
+		// Get user from DB by username
+		user, err = sqlite.GetUserByUsername(db, sanitizedUsername)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				utils.SendJSONError(w, "Invalid credentials", http.StatusUnauthorized)
+				return
+			}
+			utils.SendJSONError(w, "Database error", http.StatusInternalServerError)
+			return
+		}
 	}
 
 	// Validate password
 	if !utils.CheckPasswordHash(credentials.Password, user.PasswordHash) {
-		utils.SendJSONError(w, "Invalid email or password", http.StatusUnauthorized)
+		utils.SendJSONError(w, "Invalid credentials", http.StatusUnauthorized)
 		return
 	}
 
@@ -230,18 +267,27 @@ func LoginUser(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUser(db *sql.DB, w http.ResponseWriter, r *http.Request) {
+	// Check HTTP method first
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
 	userID, err := utils.GetUserIDFromSession(db, r)
 	// log.Printf("errr: %v\n", err)
 
-	if err != nil {
-		utils.SendJSONError(w, "Unauthorized1", http.StatusUnauthorized)
-
+	if err != nil || userID == "" {
+		utils.SendJSONError(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
 	user, err := sqlite.GetUserByID(db, userID)
 	if err != nil {
-		utils.SendJSONError(w, "User not found", http.StatusNotFound)
+		if err == sql.ErrNoRows {
+			utils.SendJSONError(w, "Unauthorized", http.StatusUnauthorized)
+		} else {
+			utils.SendJSONError(w, "User not found", http.StatusNotFound)
+		}
 		return
 	}
 
@@ -254,10 +300,11 @@ func LogoutUser(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get session cookie
+	// Get session cookie - if no cookie, still return success (graceful logout)
 	sessionCookie, err := r.Cookie("session_id")
 	if err != nil {
-		utils.SendJSONError(w, "No active session", http.StatusUnauthorized)
+		// No session cookie, but still return success
+		utils.SendJSONResponse(w, map[string]string{"message": "Logged out"}, http.StatusOK)
 		return
 	}
 
