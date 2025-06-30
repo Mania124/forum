@@ -343,9 +343,10 @@ func CountLikesAndDislikes(db *sql.DB, postID *int, commentID *int) (likes int, 
 
 // CleanupSessions removes expired sessions
 func CleanupSessions(db *sql.DB, expiryHours int) error {
+	cutoffTime := time.Now().Add(-time.Duration(expiryHours) * time.Hour)
 	_, err := db.Exec(`
-	DELETE FROM sessions WHERE created_at <= datetime('now', '-'|| ? || ' hours')
-`, -expiryHours)
+	DELETE FROM sessions WHERE datetime(created_at) <= datetime(?)
+`, cutoffTime.Format("2006-01-02 15:04:05"))
 	return err
 }
 
