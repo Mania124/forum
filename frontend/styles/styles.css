@@ -3599,6 +3599,99 @@ body.modal-open {
     gap: 1.5rem;
 }
 
+/* Liked Posts View Styles */
+.liked-posts-view {
+    background: var(--card-color);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.liked-posts-header {
+    padding: 2rem;
+    background: var(--nav-bar-color);
+    color: white;
+    text-align: center;
+}
+
+.liked-posts-header h1 {
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+
+.liked-posts-filters {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.liked-posts-content {
+    padding: 2rem;
+}
+
+.liked-posts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.liked-post-card {
+    border-left: 4px solid #e91e63;
+    background: var(--card-bg);
+    position: relative;
+}
+
+
+.no-posts {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+}
+
+.no-posts-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    color: #e91e63;
+    opacity: 0.5;
+}
+
+.no-posts h3 {
+    color: var(--text-primary);
+    margin-bottom: 10px;
+}
+
+.no-posts p {
+    margin-bottom: 30px;
+    font-size: 1.1rem;
+}
+
+.explore-btn {
+    background: var(--nav-bar-color);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.explore-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    color: white;
+    text-decoration: none;
+}
 
 /* 404 Not Found View */
 .not-found-view {

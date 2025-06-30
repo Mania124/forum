@@ -201,6 +201,9 @@ export class NavManager {
                 case 'myposts':
                     this.router.navigate('/myposts');
                     break;
+                case 'likedposts':
+                    this.router.navigate('/likedposts');
+                    break;
                 default:
                     console.warn(`Unknown view: ${view}`);
             }
