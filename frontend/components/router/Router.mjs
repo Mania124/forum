@@ -64,6 +64,13 @@ export class Router {
             title: 'Forum - My Posts',
             requiresAuth: true
         });
+
+        this.routes.set('/likedposts', {
+            name: 'likedposts',
+            component: 'LikedPostsView',
+            title: 'Forum - Liked Posts',
+            requiresAuth: true
+        });
         
         this.routes.set('/post/:id', {
             name: 'post-detail',
@@ -200,7 +207,8 @@ export class Router {
             /^\/home$/,                      // /home
             /^\/profile$/,                   // /profile
             /^\/trending$/,                  // /trending
-            /^\/myposts$/,                     // /myposts
+            /^\/myposts$/,                   // /myposts
+            /^\/likedposts$/,                // /likedposts
             /^\/post\/[^\/]+$/,             // /post/{id}
             /^\/category\/[^\/]+$/,         // /category/{id}
         ];

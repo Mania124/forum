@@ -341,6 +341,113 @@ func CountLikesAndDislikes(db *sql.DB, postID *int, commentID *int) (likes int, 
 	return
 }
 
+// GetPostsLikedByUser retrieves posts that a specific user has liked
+func GetPostsLikedByUser(db *sql.DB, userID string, page, limit int) ([]models.Post, error) {
+	offset := (page - 1) * limit
+
+	// Query posts that the user has liked
+	rows, err := db.Query(`
+		SELECT
+			posts.id,
+			posts.user_id,
+			users.username,
+			posts.title,
+			posts.content,
+			posts.image_url,
+			posts.created_at,
+			posts.updated_at
+		FROM posts
+		JOIN users ON posts.user_id = users.id
+		JOIN likes ON posts.id = likes.post_id
+		WHERE likes.user_id = ? AND likes.type = 'like'
+		ORDER BY likes.created_at DESC
+		LIMIT ? OFFSET ?
+	`, userID, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	postMap := make(map[int]*models.Post)
+	var postIDs []any
+
+	for rows.Next() {
+		var post models.Post
+		err := rows.Scan(
+			&post.ID,
+			&post.UserID,
+			&post.Username,
+			&post.Title,
+			&post.Content,
+			&post.ImageURL,
+			&post.CreatedAt,
+			&post.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		post.CategoryIDs = []int{}
+		postMap[post.ID] = &post
+		postIDs = append(postIDs, post.ID)
+	}
+
+	if len(postIDs) == 0 {
+		return []models.Post{}, nil
+	}
+
+	// Build query for categories
+	placeholders := make([]string, len(postIDs))
+	for i := range placeholders {
+		placeholders[i] = "?"
+	}
+
+	query := fmt.Sprintf(`
+		SELECT post_id, category_id
+		FROM post_categories
+		WHERE post_id IN (%s)
+	`, strings.Join(placeholders, ","))
+
+	categoryRows, err := db.Query(query, postIDs...)
+	if err != nil {
+		return nil, err
+	}
+	defer categoryRows.Close()
+
+	// Map categories to posts
+	for categoryRows.Next() {
+		var postID, categoryID int
+		if err := categoryRows.Scan(&postID, &categoryID); err != nil {
+			return nil, err
+		}
+		if post, exists := postMap[postID]; exists {
+			post.CategoryIDs = append(post.CategoryIDs, categoryID)
+		}
+	}
+
+	// Get category names for all posts
+	for _, post := range postMap {
+		if len(post.CategoryIDs) > 0 {
+			categoryNames, err := GetCategoryNamesByIDs(db, post.CategoryIDs)
+			if err != nil {
+				// Log error but don't fail the entire request
+				fmt.Printf("Warning: Failed to get category names for post %d: %v\n", post.ID, err)
+				categoryNames = []string{}
+			}
+			post.CategoryNames = categoryNames
+		}
+	}
+
+	// Convert map to slice, maintaining order
+	var posts []models.Post
+	for _, postID := range postIDs {
+		if post, exists := postMap[postID.(int)]; exists {
+			posts = append(posts, *post)
+		}
+	}
+
+	return posts, nil
+}
+
 // CleanupSessions removes expired sessions
 func CleanupSessions(db *sql.DB, expiryHours int) error {
 	cutoffTime := time.Now().Add(-time.Duration(expiryHours) * time.Hour)
