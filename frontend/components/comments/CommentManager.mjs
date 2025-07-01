@@ -13,7 +13,7 @@ export class CommentManager {
     }
 
     /**
-     * Create a comment element with threaded replies
+     * Create a parent comment element with proper structure for child replies
      * @param {Object} comment - Comment data
      * @param {boolean} isReply - Whether this is a reply comment
      * @returns {HTMLElement} - Comment element
@@ -30,37 +30,44 @@ export class CommentManager {
         const username = comment.username || comment.UserName;
         const avatarUrl = comment.avatar_url || comment.ProfileAvatar;
 
-        // Build comment actions - only show reactions for top-level comments
+        // Build comment actions - show reply button for all comments (parent and child)
         let commentActions = '';
         if (isReply) {
-            // Reply comments only show timestamp, no reactions or reply button
-            commentActions = '';
+            // Reply comments show only reply button (no reactions)
+            commentActions = `
+                <div class="comment-actions">
+                    <button class="reaction-btn comment-reply-btn" data-id="${comment.id}"><i class="fas fa-reply"></i> Reply</button>
+                </div>
+            `;
         } else {
-            // Top-level comments show reactions and reply button
+            // Parent comments show reactions and reply button
             commentActions = `
                 <div class="comment-actions">
                     <button class="reaction-btn comment-like-btn" data-id="${comment.id}"><i class="fas fa-thumbs-up"></i></button>
                     <button class="reaction-btn comment-dislike-btn" data-id="${comment.id}"><i class="fas fa-thumbs-down"></i></button>
-                    <button class="reaction-btn comment-reply-btn" data-id="${comment.id}"><i class="fas fa-comment"></i></button>
+                    <button class="reaction-btn comment-reply-btn" data-id="${comment.id}"><i class="fas fa-reply"></i> Reply</button>
                 </div>
             `;
         }
 
         commentItem.innerHTML = `
             <div class="comment-wrapper">
-                        <div class="comment-avatar">
-                <img class="post-author-img" src="http://localhost:8080${avatarUrl || '/static/pictures/default-avatar.png'}"
-                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNlNWU3ZWIiLz4KPHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSI4IiB5PSI4Ij4KPHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDEyQzE0LjIwOTEgMTIgMTYgMTAuMjA5MSAxNiA4QzE2IDUuNzkwODYgMTQuMjA5MSA0IDEyIDRDOS43OTA4NiA0IDggNS43OTA4NiA4IDhDOCAxMC4yMDkxIDkuNzkwODYgMTIgMTIgMTJaIiBmaWxsPSIjOWNhM2FmIi8+CjxwYXRoIGQ9Ik0xMiAxNEM5LjMzIDEzLjk5IDcuMDEgMTUuNjIgNiAxOEMxMC4wMSAyMCAxMy45OSAyMCAxOCAxOEMxNi45OSAxNS42MiAxNC42NyAxMy45OSAxMiAxNFoiIGZpbGw9IiM5Y2EzYWYiLz4KPC9zdmc+Cjwvc3ZnPgo8L3N2Zz4K'" />
-            </div>
-            <div class="comment-details">
-                <div>
-                    <p class="comment-content"> <strong><span class="comment-username">${username}</span>:</strong> <span class="comment-text">${comment.content}</span></p>
+                <div class="comment-avatar">
+                    <img class="post-author-img" src="http://localhost:8080${avatarUrl || '/static/pictures/default-avatar.png'}"
+                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNlNWU3ZWIiLz4KPHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSI4IiB5PSI4Ij4KPHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDEyQzE0LjIwOTEgMTIgMTYgMTAuMjA5MSAxNiA4QzE2IDUuNzkwODYgMTQuMjA5MSA0IDEyIDRDOS43OTA4NiA0IDggNS43OTA4NiA4IDhDOCAxMC4yMDkxIDkuNzkwODYgMTIgMTIgMTJaIiBmaWxsPSIjOWNhM2FmIi8+CjxwYXRoIGQ9Ik0xMiAxNEM5LjMzIDEzLjk5IDcuMDEgMTUuNjIgNiAxOEMxMC4wMSAyMCAxMy45OSAyMCAxOCAxOEMxNi45OSAxNS42MiAxNC42NyAxMy45OSAxMiAxNFoiIGZpbGw9IiM5Y2EzYWYiLz4KPC9zdmc+Cjwvc3ZnPgo8L3N2Zz4K'" />
                 </div>
-                <div class="comment-footer">
-                    ${commentActions}
-                    <p class="comment-time">${TimeUtils.getTimeAgo(comment.created_at)}</p>
+                <div class="comment-details">
+                    <div>
+                        <p class="comment-content">
+                            <strong><span class="comment-username">${username}</span>:</strong>
+                            <span class="comment-text">${comment.content}</span>
+                        </p>
+                    </div>
+                    <div class="comment-footer">
+                        ${commentActions}
+                        <p class="comment-time">${TimeUtils.getTimeAgo(comment.created_at)}</p>
+                    </div>
                 </div>
-            </div>
             </div>
             ${!isReply ? `<div class="replies-container" data-comment-id="${comment.id}"></div>` : ''}
         `;
@@ -69,18 +76,85 @@ export class CommentManager {
     }
 
     /**
-     * Render replies for a comment using the replies data from the comment object
+     * Render ALL CHILD replies directly under a PARENT comment - FETCH AND SHOW EVERYTHING
+     * @param {HTMLElement} parentCommentElement - The parent comment element
+     * @param {Array} childReplies - Array of child reply objects
+     */
+    renderChildRepliesUnderParent(parentCommentElement, childReplies) {
+        const repliesContainer = parentCommentElement.querySelector('.replies-container');
+        if (!repliesContainer) {
+            console.warn('⚠️ No replies container found for PARENT comment element');
+            return;
+        }
+
+        if (!childReplies || !Array.isArray(childReplies)) {
+            console.log('ℹ️ No CHILD replies array provided');
+            return;
+        }
+
+        if (childReplies.length === 0) {
+            console.log('ℹ️ CHILD replies array is empty');
+            return;
+        }
+
+        console.log(`🔄 RENDERING ALL ${childReplies.length} CHILD REPLIES under PARENT:`, childReplies);
+
+        // Clear any existing replies first to avoid duplicates
+        repliesContainer.innerHTML = '';
+
+        // RENDER EVERY SINGLE CHILD REPLY - NO EXCEPTIONS
+        childReplies.forEach((childReply, index) => {
+            console.log(`📝 RENDERING CHILD REPLY ${index + 1}/${childReplies.length} (ID: ${childReply.id}):`, {
+                id: childReply.id,
+                content: childReply.content,
+                username: childReply.username || childReply.UserName,
+                created_at: childReply.created_at
+            });
+
+            try {
+                // Create the CHILD reply element
+                const childReplyElement = this.createCommentElement(childReply, true);
+
+                // FORCE ADD the CHILD reply to the PARENT's replies container
+                repliesContainer.appendChild(childReplyElement);
+
+                console.log(`✅ SUCCESS: CHILD reply ${childReply.id} rendered under PARENT`);
+            } catch (error) {
+                console.error(`❌ FAILED: Error rendering CHILD reply ${childReply.id}:`, error);
+
+                // Try to render a fallback element
+                try {
+                    const fallbackElement = document.createElement('div');
+                    fallbackElement.className = 'comment reply-comment error-reply';
+                    fallbackElement.innerHTML = `
+                        <div class="comment-wrapper">
+                            <div class="comment-details">
+                                <p class="comment-content">
+                                    <strong>Error loading reply:</strong> ${childReply.content || 'Content unavailable'}
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                    repliesContainer.appendChild(fallbackElement);
+                    console.log(`🔧 Fallback element created for reply ${childReply.id}`);
+                } catch (fallbackError) {
+                    console.error(`❌ Even fallback failed for reply ${childReply.id}:`, fallbackError);
+                }
+            }
+        });
+
+        console.log(`✅ COMPLETED: ALL ${childReplies.length} CHILD REPLIES RENDERED under PARENT`);
+        console.log(`📊 Final replies container children count:`, repliesContainer.children.length);
+    }
+
+    /**
+     * Legacy method - keeping for compatibility
      * @param {HTMLElement} commentElement - The parent comment element
      * @param {Array} replies - Array of reply objects
      */
     renderRepliesForComment(commentElement, replies) {
-        const repliesContainer = commentElement.querySelector('.replies-container');
-        if (!repliesContainer || !replies || replies.length === 0) return;
-
-        replies.forEach(reply => {
-            const replyElement = this.createCommentElement(reply, true);
-            repliesContainer.appendChild(replyElement);
-        });
+        // Use the new method
+        this.renderChildRepliesUnderParent(commentElement, replies);
     }
 
     /**
@@ -158,12 +232,17 @@ export class CommentManager {
     }
 
     /**
-     * Handle top-level comment submission
+     * Handle PARENT comment submission
      * @param {HTMLElement} form - The form element
      * @param {string} content - Comment content
      * @param {string} postId - Post ID
      */
     async handleTopLevelCommentSubmit(form, content, postId) {
+        console.log(`💬 Submitting new PARENT comment for post ${postId}:`, content);
+
+        // CLOSE ALL REPLY FORMS when submitting a parent comment
+        this.clearAllReplyForms(postId);
+
         const commentData = {
             post_id: parseInt(postId),
             content: content
@@ -171,14 +250,17 @@ export class CommentManager {
 
         try {
             const result = await ApiUtils.post('/api/comments/create', commentData, true);
+            console.log(`✅ PARENT comment created successfully:`, result);
 
             // Clear the textarea
             form.querySelector('textarea').value = '';
 
-            // Refresh comments for this post
+            // Refresh comments for this post - this will preserve all PARENT-CHILD relationships
+            console.log(`🔄 Refreshing comments for post ${postId} after new PARENT comment...`);
             await this.refreshPostComments(postId);
 
         } catch (error) {
+            console.error(`❌ Error submitting PARENT comment:`, error);
             const errorInfo = ApiUtils.handleError(error, 'comment creation');
 
             if (errorInfo.requiresAuth) {
@@ -190,39 +272,40 @@ export class CommentManager {
     }
 
     /**
-     * Handle reply submission
+     * Handle CHILD reply submission to a PARENT comment
      * @param {HTMLElement} form - The form element
      * @param {string} content - Reply content
      * @param {string} parentCommentId - Parent comment ID
      */
     async handleReplySubmit(form, content, parentCommentId) {
+        console.log(`💬 Submitting CHILD reply to PARENT comment ${parentCommentId}:`, content);
+
         const replyData = {
             parent_comment_id: parseInt(parentCommentId),
             content: content
         };
 
-        console.log('Submitting reply:', replyData); // Debug log
-
         try {
             const result = await ApiUtils.post('/api/comment/reply/create', replyData, true);
-            console.log('Reply created successfully:', result); // Debug log
+            console.log(`✅ CHILD reply created successfully under PARENT ${parentCommentId}:`, result);
 
             // Find the post ID from the parent comment context
             const postCommentSection = form.closest('.post-comment');
             const postId = postCommentSection.getAttribute('data-id');
 
-            // Close the specific reply form
+            // Close the specific reply form after successful submission
             const replyFormContainer = form.closest('.reply-form-container');
             if (replyFormContainer) {
                 const commentId = replyFormContainer.getAttribute('data-comment-id');
                 this.closeReplyForm(postId, commentId);
             }
 
-            // Refresh comments for this post to show the new reply
+            // Refresh comments to show the new CHILD reply under its PARENT
+            console.log(`🔄 Refreshing comments to show new CHILD reply under PARENT ${parentCommentId}...`);
             await this.refreshPostComments(postId);
 
         } catch (error) {
-            console.error('Reply submission error:', error); // Debug log
+            console.error(`❌ Error submitting CHILD reply to PARENT ${parentCommentId}:`, error);
             const errorInfo = ApiUtils.handleError(error, 'reply creation');
 
             if (errorInfo.requiresAuth) {
@@ -239,54 +322,165 @@ export class CommentManager {
      */
     async refreshPostComments(postId) {
         try {
+            // Add a delay to ensure the backend has fully processed and committed the new comment/reply
+            console.log(`⏳ Waiting for backend to process comment/reply...`);
+            await new Promise(resolve => setTimeout(resolve, 800));
+
+            console.log(`📡 FETCHING ALL COMMENTS AND REPLIES for post ${postId}...`);
             const comments = await ApiUtils.get(`/api/comments/get?post_id=${postId}`);
 
-            console.log(`Comments for post ${postId}:`, comments); // Debug log
+            console.log(`🔄 RECEIVED ALL COMMENTS DATA for post ${postId}:`, comments);
 
             if (!comments || !Array.isArray(comments)) {
-                console.error('Invalid comments data received:', comments);
+                console.error('❌ Invalid comments data received:', comments);
                 return;
             }
 
-            // Calculate total comment count (including replies)
+            // FORCE FETCH AGAIN if no replies found but we expect them
+            let retryCount = 0;
+            while (retryCount < 2) {
+                const hasAnyReplies = comments.some(comment => {
+                    const replies = comment.replies || comment.Replies;
+                    return replies && Array.isArray(replies) && replies.length > 0;
+                });
+
+                if (!hasAnyReplies && retryCount < 1) {
+                    console.log(`🔄 No replies found, retrying fetch... (attempt ${retryCount + 1})`);
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    const freshComments = await ApiUtils.get(`/api/comments/get?post_id=${postId}`);
+                    if (freshComments && Array.isArray(freshComments)) {
+                        comments.splice(0, comments.length, ...freshComments);
+                    }
+                    retryCount++;
+                } else {
+                    break;
+                }
+            }
+
+            // ANALYZE AND COUNT ALL COMMENTS AND REPLIES - VERIFY EVERYTHING IS FETCHED
             let totalCommentCount = comments.length;
-            comments.forEach(comment => {
-                // Check both 'replies' and 'Replies' for compatibility
-                const replies = comment.replies || comment.Replies;
-                if (replies && Array.isArray(replies)) {
-                    console.log(`Comment ${comment.id} has ${replies.length} replies:`, replies); // Debug log
+            let totalRepliesFound = 0;
+
+            console.log(`🔍 ANALYZING ALL ${comments.length} COMMENTS FOR REPLIES...`);
+
+            comments.forEach((comment, index) => {
+                // Check ALL possible reply field names
+                const replies = comment.replies || comment.Replies || comment.children || comment.Children || [];
+
+                console.log(`📝 COMMENT ${index + 1}/${comments.length} (ID: ${comment.id}) ANALYSIS:`, {
+                    content: comment.content.substring(0, 50) + '...',
+                    username: comment.username || comment.UserName,
+                    hasReplies: !!(replies && Array.isArray(replies) && replies.length > 0),
+                    repliesCount: Array.isArray(replies) ? replies.length : 0,
+                    repliesField: comment.replies,
+                    RepliesField: comment.Replies,
+                    childrenField: comment.children,
+                    ChildrenField: comment.Children,
+                    fullRepliesData: replies
+                });
+
+                if (Array.isArray(replies) && replies.length > 0) {
+                    totalRepliesFound += replies.length;
                     totalCommentCount += replies.length;
+
+                    // Log each individual reply
+                    replies.forEach((reply, replyIndex) => {
+                        console.log(`  📄 REPLY ${replyIndex + 1}/${replies.length} (ID: ${reply.id}):`, {
+                            content: reply.content.substring(0, 30) + '...',
+                            username: reply.username || reply.UserName,
+                            parentId: reply.parent_comment_id || reply.ParentCommentID
+                        });
+                    });
                 }
             });
 
-            console.log(`Total comment count for post ${postId}: ${totalCommentCount}`); // Debug log
+            console.log(`📊 FINAL SUMMARY for post ${postId}:`, {
+                totalParentComments: comments.length,
+                totalChildReplies: totalRepliesFound,
+                grandTotal: totalCommentCount,
+                allCommentsHaveBeenAnalyzed: true
+            });
 
-            // Clear and re-render comments with proper threading
+            // VERIFY: If we expect replies but found none, log a warning
+            if (totalRepliesFound === 0) {
+                console.warn(`⚠️ WARNING: NO REPLIES FOUND for post ${postId}. This might be normal or indicate a data issue.`);
+                console.log(`🔍 RAW API RESPONSE:`, comments);
+            } else {
+                console.log(`✅ SUCCESS: Found ${totalRepliesFound} replies across ${comments.length} parent comments`);
+            }
+
+            // Get the comments container
             const commentsContainer = PostCard.getCommentsContainer(postId);
-            if (commentsContainer) {
-                commentsContainer.innerHTML = '<h4>Comments</h4>';
+            if (!commentsContainer) {
+                console.error('❌ Comments container not found for post:', postId);
+                return;
+            }
 
-                // Render each top-level comment with its own independent thread
-                for (const comment of comments) {
-                    // Create a comment thread container for this specific comment
-                    const commentThreadContainer = document.createElement('div');
-                    commentThreadContainer.classList.add('comment-thread');
-                    commentThreadContainer.setAttribute('data-comment-id', comment.id);
+            // Clear and rebuild the entire comments section
+            commentsContainer.innerHTML = '<h4>Comments</h4>';
 
-                    // Create the main comment element
-                    const commentElement = this.createCommentElement(comment);
-                    commentThreadContainer.appendChild(commentElement);
+            // RENDER EVERY SINGLE PARENT COMMENT WITH ALL ITS CHILD REPLIES
+            for (let i = 0; i < comments.length; i++) {
+                const parentComment = comments[i];
+                console.log(`🏗️ BUILDING PARENT COMMENT ${i + 1}/${comments.length} (ID: ${parentComment.id})`);
 
-                    // Render replies directly under this specific comment
-                    const replies = comment.replies || comment.Replies;
-                    if (replies && Array.isArray(replies) && replies.length > 0) {
-                        console.log(`Rendering ${replies.length} replies for comment ${comment.id}`); // Debug log
-                        this.renderRepliesForComment(commentElement, replies);
-                    }
+                // Create the PARENT comment element (this is the main comment)
+                const parentCommentElement = this.createCommentElement(parentComment, false);
 
-                    // Add the complete thread (comment + replies) to the comments container
-                    commentsContainer.appendChild(commentThreadContainer);
+                // Add the PARENT comment to the container first
+                commentsContainer.appendChild(parentCommentElement);
+
+                // EXTRACT ALL POSSIBLE REPLY FIELDS - check every possible field name
+                const replies = parentComment.replies || parentComment.Replies || parentComment.children || parentComment.Children || [];
+
+                console.log(`🔍 PARENT comment ${parentComment.id} REPLY ANALYSIS:`, {
+                    repliesField: parentComment.replies,
+                    RepliesField: parentComment.Replies,
+                    childrenField: parentComment.children,
+                    ChildrenField: parentComment.Children,
+                    finalReplies: replies,
+                    repliesCount: Array.isArray(replies) ? replies.length : 0
+                });
+
+                if (Array.isArray(replies) && replies.length > 0) {
+                    console.log(`✅ FOUND ${replies.length} CHILD REPLIES for PARENT comment ${parentComment.id}`);
+                    console.log(`📋 ALL CHILD REPLIES DATA:`, replies);
+
+                    // FORCE RENDER ALL CHILD REPLIES
+                    this.renderChildRepliesUnderParent(parentCommentElement, replies);
+                } else {
+                    console.log(`⚠️ NO CHILD REPLIES found for PARENT comment ${parentComment.id}`);
+
+                    // Double-check the parent comment object structure
+                    console.log(`🔍 FULL PARENT COMMENT OBJECT:`, parentComment);
                 }
+            }
+
+            console.log(`✅ COMPLETED RENDERING ALL COMMENTS AND REPLIES`);
+
+            // FINAL VERIFICATION: Count what was actually rendered in the DOM
+            const renderedComments = commentsContainer.querySelectorAll('.comment:not(.reply-comment)');
+            const renderedReplies = commentsContainer.querySelectorAll('.comment.reply-comment');
+
+            console.log(`🔍 FINAL DOM VERIFICATION:`, {
+                expectedParentComments: comments.length,
+                renderedParentComments: renderedComments.length,
+                expectedReplies: totalRepliesFound,
+                renderedReplies: renderedReplies.length,
+                totalExpected: totalCommentCount,
+                totalRendered: renderedComments.length + renderedReplies.length
+            });
+
+            // Log any discrepancies
+            if (renderedComments.length !== comments.length) {
+                console.warn(`⚠️ PARENT COMMENT MISMATCH: Expected ${comments.length}, Rendered ${renderedComments.length}`);
+            }
+            if (renderedReplies.length !== totalRepliesFound) {
+                console.warn(`⚠️ REPLY MISMATCH: Expected ${totalRepliesFound}, Rendered ${renderedReplies.length}`);
+            }
+
+            if (renderedComments.length === comments.length && renderedReplies.length === totalRepliesFound) {
+                console.log(`🎉 PERFECT MATCH: All comments and replies rendered successfully!`);
             }
 
             // Update comment count with total (comments + replies)
@@ -296,7 +490,7 @@ export class CommentManager {
             await this.reactionManager.loadCommentsLikes();
 
         } catch (error) {
-            console.error('Error refreshing comments:', error);
+            console.error('❌ Error refreshing comments:', error);
         }
     }
 
@@ -312,7 +506,7 @@ export class CommentManager {
     }
 
     /**
-     * Handle reply button click
+     * Handle reply button click - creates CHILD reply form under PARENT comment
      * @param {Event} e - Click event
      */
     handleReplyClick(e) {
@@ -321,25 +515,30 @@ export class CommentManager {
         const postComments = e.target.closest(`.post-card .post-comment`);
         const postID = postComments.getAttribute('data-id');
 
-        // Find the specific comment element being replied to
-        const originalCommentElement = document.querySelector(`.post-card .post-comment[data-id="${postID}"] .comment[comment-id="${commentID}"]`);
+        console.log(`💬 Reply button clicked for PARENT comment: ${commentID}`);
 
-        if (!originalCommentElement) {
-            console.error('Original comment element not found');
+        // HIDE THE PARENT COMMENT INPUT FORM when opening a reply form
+        this.hideParentCommentForm(postID);
+
+        // Find the specific PARENT comment element being replied to
+        const parentCommentElement = document.querySelector(`.post-card .post-comment[data-id="${postID}"] .comment[comment-id="${commentID}"]`);
+
+        if (!parentCommentElement) {
+            console.error('PARENT comment element not found');
             return;
         }
 
         // Remove any existing reply forms from this post
         this.clearAllReplyForms(postID);
 
-        // Get comment details
-        const commenterAvatarSrc = originalCommentElement.querySelector('.comment-avatar img').getAttribute('src');
-        const originalCommenterUsername = originalCommentElement.querySelector('.comment-details .comment-content span.comment-username').textContent;
-        const originalCommenterText = originalCommentElement.querySelector('.comment-details .comment-content span.comment-text').textContent;
-        const commentTimestamp = originalCommentElement.querySelector('.comment-details .comment-time').textContent;
+        // Get PARENT comment details
+        const commenterAvatarSrc = parentCommentElement.querySelector('.comment-avatar img').getAttribute('src');
+        const originalCommenterUsername = parentCommentElement.querySelector('.comment-details .comment-content span.comment-username').textContent;
+        const originalCommenterText = parentCommentElement.querySelector('.comment-details .comment-content span.comment-text').textContent;
+        const commentTimestamp = parentCommentElement.querySelector('.comment-details .comment-time').textContent;
 
-        // Create reply form directly under this specific comment
-        this.createReplyFormUnderComment(originalCommentElement, {
+        // Create CHILD reply form directly under this PARENT comment
+        this.createReplyFormUnderParentComment(parentCommentElement, {
             commentID,
             postID,
             commenterAvatarSrc,
@@ -350,7 +549,31 @@ export class CommentManager {
     }
 
     /**
-     * Clear all existing reply forms from a post
+     * Hide the PARENT comment input form when a reply form is opened
+     * @param {string} postID - Post ID
+     */
+    hideParentCommentForm(postID) {
+        const parentCommentForm = document.querySelector(`.post-card .post-comment[data-id="${postID}"] .write-comment-box`);
+        if (parentCommentForm) {
+            parentCommentForm.style.display = 'none';
+            console.log(`🙈 Hidden PARENT comment form for post ${postID}`);
+        }
+    }
+
+    /**
+     * Show the PARENT comment input form when reply forms are closed
+     * @param {string} postID - Post ID
+     */
+    showParentCommentForm(postID) {
+        const parentCommentForm = document.querySelector(`.post-card .post-comment[data-id="${postID}"] .write-comment-box`);
+        if (parentCommentForm) {
+            parentCommentForm.style.display = 'block';
+            console.log(`👁️ Shown PARENT comment form for post ${postID}`);
+        }
+    }
+
+    /**
+     * Clear all existing reply forms from a post and show parent form
      * @param {string} postID - Post ID
      */
     clearAllReplyForms(postID) {
@@ -358,19 +581,20 @@ export class CommentManager {
         const existingReplyForms = document.querySelectorAll(`.post-card .post-comment[data-id="${postID}"] .reply-form-container`);
         existingReplyForms.forEach(form => form.remove());
 
-        // Restore the main comment form if it was replaced
-        const mainCommentBox = document.querySelector(`.post-card .post-comment[data-id="${postID}"] .write-comment-box`);
-        if (mainCommentBox && !mainCommentBox.querySelector('form[data-post-id]')) {
-            this.restoreMainCommentForm(postID);
-        }
+        // Show the parent comment form when reply forms are cleared
+        this.showParentCommentForm(postID);
+
+        console.log(`🧹 Cleared all reply forms for post ${postID} and restored parent form`);
     }
 
     /**
-     * Create reply form directly under a specific comment
-     * @param {HTMLElement} commentElement - The comment element to reply to
+     * Create CHILD reply form directly under a PARENT comment
+     * @param {HTMLElement} parentCommentElement - The PARENT comment element to reply to
      * @param {Object} replyData - Reply data
      */
-    createReplyFormUnderComment(commentElement, replyData) {
+    createReplyFormUnderParentComment(parentCommentElement, replyData) {
+        console.log(`📝 Creating CHILD reply form under PARENT comment ${replyData.commentID}`);
+
         // Create reply form container
         const replyFormContainer = document.createElement('div');
         replyFormContainer.classList.add('reply-form-container');
@@ -378,8 +602,8 @@ export class CommentManager {
 
         replyFormContainer.innerHTML = `
             <div class="reply-comment-header">
-                <div><p><em>Replying to ${replyData.originalCommenterUsername}</em></p></div>
-                <button class="close-reply" data-post-id="${replyData.postID}" data-comment-id="${replyData.commentID}">Cancel</button>
+                <div><p><em>💬 Replying to PARENT comment by ${replyData.originalCommenterUsername}</em></p></div>
+                <button class="close-reply" data-post-id="${replyData.postID}" data-comment-id="${replyData.commentID}">❌ Cancel</button>
             </div>
             <div class="comment original-comment-preview">
                 <div class="comment-avatar">
@@ -393,13 +617,20 @@ export class CommentManager {
                 </div>
             </div>
             <form class="comment-box-form reply-form" comment-id="${replyData.commentID}">
-                <textarea placeholder="Write your reply to @${replyData.originalCommenterUsername}..." cols="30" rows="2" required autocomplete="off"></textarea>
-                <button type="submit">Reply</button>
+                <textarea placeholder="Write your CHILD reply to @${replyData.originalCommenterUsername}..." cols="30" rows="2" required autocomplete="off"></textarea>
+                <button type="submit">💬 Reply</button>
             </form>
         `;
 
-        // Insert the reply form directly after the comment element
-        commentElement.parentNode.insertBefore(replyFormContainer, commentElement.nextSibling);
+        // Insert the CHILD reply form directly under the PARENT comment
+        const repliesContainer = parentCommentElement.querySelector('.replies-container');
+        if (repliesContainer) {
+            // Insert at the beginning of the replies container
+            repliesContainer.insertBefore(replyFormContainer, repliesContainer.firstChild);
+        } else {
+            // Fallback: insert after the parent comment element
+            parentCommentElement.parentNode.insertBefore(replyFormContainer, parentCommentElement.nextSibling);
+        }
 
         // Attach the submit handler to the new form
         const form = replyFormContainer.querySelector('form');
@@ -410,6 +641,18 @@ export class CommentManager {
         if (textarea) {
             textarea.focus();
         }
+
+        console.log(`✅ CHILD reply form created under PARENT comment ${replyData.commentID}`);
+    }
+
+    /**
+     * Legacy method - keeping for compatibility
+     * @param {HTMLElement} commentElement - The comment element to reply to
+     * @param {Object} replyData - Reply data
+     */
+    createReplyFormUnderComment(commentElement, replyData) {
+        // Use the new method
+        this.createReplyFormUnderParentComment(commentElement, replyData);
     }
 
     /**
@@ -456,22 +699,28 @@ export class CommentManager {
     }
 
     /**
-     * Close specific reply form
+     * Close specific CHILD reply form and restore PARENT comment form
      * @param {string} postId - Post ID
      * @param {string} commentId - Comment ID (optional)
      */
     closeReplyForm(postId, commentId = null) {
         if (commentId) {
-            // Remove specific reply form
+            // Remove specific CHILD reply form
             const replyFormContainer = document.querySelector(`.post-card .post-comment[data-id="${postId}"] .reply-form-container[data-comment-id="${commentId}"]`);
             if (replyFormContainer) {
                 replyFormContainer.remove();
+                console.log(`🗑️ Removed CHILD reply form for comment ${commentId}`);
             }
         } else {
             // Remove all reply forms for this post
             this.clearAllReplyForms(postId);
         }
+
+        // SHOW THE PARENT COMMENT FORM when reply form is closed
+        this.showParentCommentForm(postId);
     }
+
+
 
     /**
      * Get comments for a specific post
