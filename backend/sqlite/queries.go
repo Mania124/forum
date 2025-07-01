@@ -12,6 +12,14 @@ import (
 	"github.com/google/uuid"
 )
 
+// Helper function for min
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
 // GetUserByUsername retrieves a user by username
 func GetUserByUsername(db *sql.DB, username string) (models.User, error) {
 	var user models.User
@@ -530,7 +538,7 @@ func CreateReplyComment(db *sql.DB, userID string, parentCommentID int, content 
 func GetPostComments(db *sql.DB, postID int) ([]models.Comment, error) {
 	// Step 1: Fetch top-level comments
 	commentRows, err := db.Query(`
-		SELECT 
+		SELECT
 			c.id, c.user_id, c.post_id, c.content,
 			c.created_at, c.updated_at, u.username, u.avatar_url
 		FROM comments c
@@ -543,7 +551,7 @@ func GetPostComments(db *sql.DB, postID int) ([]models.Comment, error) {
 	}
 	defer commentRows.Close()
 
-	commentsMap := make(map[int]*models.Comment)
+	commentsMap := make(map[int]int) // Map comment ID to index in slice
 	var comments []models.Comment
 
 	for commentRows.Next() {
@@ -562,12 +570,12 @@ func GetPostComments(db *sql.DB, postID int) ([]models.Comment, error) {
 			return nil, err
 		}
 		comments = append(comments, c)
-		commentsMap[c.ID] = &comments[len(comments)-1] // store pointer
+		commentsMap[c.ID] = len(comments) - 1 // store index instead of pointer
 	}
 
 	// Step 2: Fetch replies
 	replyRows, err := db.Query(`
-		SELECT 
+		SELECT
 			r.id, r.user_id, r.parent_comment_id, r.content,
 			r.created_at, r.updated_at, u.username, u.avatar_url
 		FROM replycomments r
@@ -598,8 +606,8 @@ func GetPostComments(db *sql.DB, postID int) ([]models.Comment, error) {
 			return nil, err
 		}
 
-		if parent, ok := commentsMap[r.ParentCommentID]; ok {
-			parent.Replies = append(parent.Replies, r)
+		if parentIndex, ok := commentsMap[r.ParentCommentID]; ok {
+			comments[parentIndex].Replies = append(comments[parentIndex].Replies, r)
 		}
 	}
 
