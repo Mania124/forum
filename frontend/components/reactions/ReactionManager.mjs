@@ -151,19 +151,37 @@ export class ReactionManager {
                 const result = await ApiUtils.get(`/api/likes/reactions?comment_id=${commentId}`);
 
                 if (btn.classList.contains('comment-like-btn')) {
-                    // Clear existing content and add new count
-                    const icon = btn.querySelector('i');
-                    btn.innerHTML = '';
-                    btn.appendChild(icon);
-                    btn.insertAdjacentHTML("beforeend", ` ${result.likes === 0 ? '' : result.likes}`);
+                    const countSpan = btn.querySelector('.like-count');
+                    if (countSpan) {
+                        countSpan.textContent = result.likes || 0;
+                        // Hide count if zero for cleaner look
+                        countSpan.style.display = result.likes > 0 ? 'inline' : 'none';
+                    }
+
+                    // Add active state if user has liked
+                    if (result.userReaction === 'like') {
+                        btn.classList.add('active', 'liked');
+                        btn.classList.remove('disliked');
+                    } else {
+                        btn.classList.remove('active', 'liked');
+                    }
                 }
-                
+
                 if (btn.classList.contains('comment-dislike-btn')) {
-                    // Clear existing content and add new count
-                    const icon = btn.querySelector('i');
-                    btn.innerHTML = '';
-                    btn.appendChild(icon);
-                    btn.insertAdjacentHTML("beforeend", ` ${result.dislikes === 0 ? '' : result.dislikes}`);
+                    const countSpan = btn.querySelector('.dislike-count');
+                    if (countSpan) {
+                        countSpan.textContent = result.dislikes || 0;
+                        // Hide count if zero for cleaner look
+                        countSpan.style.display = result.dislikes > 0 ? 'inline' : 'none';
+                    }
+
+                    // Add active state if user has disliked
+                    if (result.userReaction === 'dislike') {
+                        btn.classList.add('active', 'disliked');
+                        btn.classList.remove('liked');
+                    } else {
+                        btn.classList.remove('active', 'disliked');
+                    }
                 }
             } catch (error) {
                 console.error(`Error loading reactions for comment ${commentId}:`, error);

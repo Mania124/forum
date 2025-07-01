@@ -46,8 +46,14 @@ export class CommentManager {
             // Parent comments show reactions and reply button
             commentActions = `
                 <div class="comment-actions">
-                    <button class="reaction-btn comment-like-btn" data-id="${comment.id}"><i class="fas fa-thumbs-up"></i></button>
-                    <button class="reaction-btn comment-dislike-btn" data-id="${comment.id}"><i class="fas fa-thumbs-down"></i></button>
+                    <button class="reaction-btn comment-like-btn" data-id="${comment.id}">
+                        <i class="fas fa-thumbs-up"></i>
+                        <span class="reaction-count like-count">0</span>
+                    </button>
+                    <button class="reaction-btn comment-dislike-btn" data-id="${comment.id}">
+                        <i class="fas fa-thumbs-down"></i>
+                        <span class="reaction-count dislike-count">0</span>
+                    </button>
                     <button class="reaction-btn comment-reply-btn" data-id="${comment.id}">
                         <i class="fas fa-reply"></i>
                         <span>Reply</span>
