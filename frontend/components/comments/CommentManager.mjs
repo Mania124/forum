@@ -36,7 +36,10 @@ export class CommentManager {
             // Reply comments show only reply button (no reactions)
             commentActions = `
                 <div class="comment-actions">
-                    <button class="reaction-btn comment-reply-btn" data-id="${comment.id}"><i class="fas fa-reply"></i> Reply</button>
+                    <button class="reaction-btn comment-reply-btn" data-id="${comment.id}">
+                        <i class="fas fa-reply"></i>
+                        <span>Reply</span>
+                    </button>
                 </div>
             `;
         } else {
@@ -45,7 +48,10 @@ export class CommentManager {
                 <div class="comment-actions">
                     <button class="reaction-btn comment-like-btn" data-id="${comment.id}"><i class="fas fa-thumbs-up"></i></button>
                     <button class="reaction-btn comment-dislike-btn" data-id="${comment.id}"><i class="fas fa-thumbs-down"></i></button>
-                    <button class="reaction-btn comment-reply-btn" data-id="${comment.id}"><i class="fas fa-reply"></i> Reply</button>
+                    <button class="reaction-btn comment-reply-btn" data-id="${comment.id}">
+                        <i class="fas fa-reply"></i>
+                        <span>Reply</span>
+                    </button>
                 </div>
             `;
         }
@@ -170,6 +176,9 @@ export class CommentManager {
 
         this.setupReplyHandlers();
         this.setupCloseReplyHandlers();
+
+        // Initialize responsive behavior
+        this.initializeResponsive();
     }
 
     /**
@@ -495,11 +504,15 @@ export class CommentManager {
     }
 
     /**
-     * Setup reply button handlers
+     * Setup reply button handlers - ensures entire button (icon + text) is clickable
      */
     setupReplyHandlers() {
         document.addEventListener('click', (e) => {
-            if (e.target.closest('.comment-reply-btn')) {
+            // Check if clicked element or any parent is a reply button
+            const replyButton = e.target.closest('.comment-reply-btn');
+            if (replyButton) {
+                e.preventDefault();
+                e.stopPropagation();
                 this.handleReplyClick(e);
             }
         });
@@ -636,10 +649,21 @@ export class CommentManager {
         const form = replyFormContainer.querySelector('form');
         form.addEventListener('submit', (e) => this.handleCommentSubmit(e));
 
-        // Focus on the textarea
+        // Focus on the textarea and scroll into view for mobile
         const textarea = replyFormContainer.querySelector('textarea');
         if (textarea) {
-            textarea.focus();
+            // Small delay to ensure DOM is updated
+            setTimeout(() => {
+                textarea.focus();
+
+                // Scroll the reply form into view on mobile devices
+                if (window.innerWidth <= 768) {
+                    replyFormContainer.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
+            }, 100);
         }
 
         console.log(`✅ CHILD reply form created under PARENT comment ${replyData.commentID}`);
@@ -735,5 +759,62 @@ export class CommentManager {
             console.error(`Error getting comments for post ${postId}:`, error);
             return [];
         }
+    }
+
+    /**
+     * Check if device is mobile based on screen width
+     * @returns {boolean} - True if mobile device
+     */
+    isMobileDevice() {
+        return window.innerWidth <= 768;
+    }
+
+    /**
+     * Adjust comment section for mobile devices
+     */
+    adjustForMobile() {
+        if (this.isMobileDevice()) {
+            // Add mobile-specific classes
+            document.querySelectorAll('.comments-section').forEach(section => {
+                section.classList.add('mobile-comments');
+            });
+
+            // Adjust textarea behavior for mobile
+            document.querySelectorAll('.comment-box-form textarea, .reply-form textarea').forEach(textarea => {
+                // Prevent zoom on iOS
+                textarea.style.fontSize = '16px';
+
+                // Add mobile-friendly attributes
+                textarea.setAttribute('autocomplete', 'off');
+                textarea.setAttribute('autocorrect', 'off');
+                textarea.setAttribute('autocapitalize', 'sentences');
+            });
+        }
+    }
+
+    /**
+     * Handle window resize for responsive behavior
+     */
+    handleResize() {
+        this.adjustForMobile();
+    }
+
+    /**
+     * Initialize responsive behavior
+     */
+    initializeResponsive() {
+        this.adjustForMobile();
+
+        // Listen for window resize
+        window.addEventListener('resize', () => {
+            this.handleResize();
+        });
+
+        // Listen for orientation change on mobile
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                this.adjustForMobile();
+            }, 100);
+        });
     }
 }
