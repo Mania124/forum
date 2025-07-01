@@ -3340,6 +3340,9 @@ body.modal-open {
     background: var(--hover-color2);
     border-radius: var(--radius);
     border-left: 3px solid var(--accent-color);
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 /* Reply comment header */
@@ -3471,6 +3474,10 @@ body.modal-open {
     border-radius: var(--radius);
     transition: var(--transition);
     font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    user-select: none;
 }
 
 .comments-list .reaction-btn:hover {
@@ -3478,9 +3485,373 @@ body.modal-open {
     color: var(--text-color);
 }
 
+/* Ensure the entire reply button is clickable */
+.comments-list .comment-reply-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.4rem 0.8rem;
+    background: var(--hover-color2);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.comments-list .comment-reply-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Make sure icon and text are not separately clickable */
+.comments-list .comment-reply-btn i,
+.comments-list .comment-reply-btn span {
+    pointer-events: none;
+}
+
 .comments-list .comment-time {
     color: var(--muted-text);
     font-size: 0.8rem;
+}
+
+/* ========== RESPONSIVE COMMENT SECTION ========== */
+
+/* Mobile First - Base styles for small screens */
+@media (max-width: 768px) {
+    /* Comments Section */
+    .comments-section {
+        padding: 1rem;
+    }
+
+    /* Comment Structure */
+    .comments-list .comment {
+        padding: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+
+    /* Comment Wrapper - Stack on mobile */
+    .comment .comment-wrapper {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    /* Avatar adjustments for mobile */
+    .comment-avatar {
+        width: 35px !important;
+        height: 35px !important;
+        align-self: flex-start;
+    }
+
+    .comment-avatar img {
+        width: 35px !important;
+        height: 35px !important;
+    }
+
+    /* Reply comment avatars even smaller */
+    .comment.reply-comment .comment-avatar {
+        width: 28px !important;
+        height: 28px !important;
+    }
+
+    .comment.reply-comment .comment-avatar img {
+        width: 28px !important;
+        height: 28px !important;
+    }
+
+    /* Comment Details */
+    .comment-details {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    /* Reply Comments - Reduce indentation on mobile */
+    .comments-list .reply-comment {
+        margin-left: 1rem;
+        margin-top: 0.5rem;
+        padding: 0.5rem;
+    }
+
+    /* Comment Actions - Stack vertically on very small screens */
+    .comment-actions {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    /* Reply Button - Full width on mobile */
+    .comments-list .comment-reply-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    /* Comment Form - Full width */
+    .comment-box-form {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .comment-box-form textarea {
+        width: 100%;
+        min-height: 60px;
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+
+    .comment-box-form button {
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 1rem;
+    }
+
+    /* Reply Form Container */
+    .reply-form-container {
+        margin: 0.5rem 0;
+        padding: 0.75rem;
+    }
+
+    /* Reply Form Header */
+    .reply-comment-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+
+    .reply-comment-header .close-reply {
+        align-self: flex-end;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    /* Original Comment Preview in Reply Form */
+    .original-comment-preview {
+        padding: 0.5rem;
+        margin: 0.5rem 0;
+    }
+
+    .original-comment-preview .comment-wrapper {
+        flex-direction: row;
+        gap: 0.5rem;
+    }
+
+    .original-comment-preview .comment-avatar {
+        width: 24px !important;
+        height: 24px !important;
+    }
+
+    .original-comment-preview .comment-avatar img {
+        width: 24px !important;
+        height: 24px !important;
+    }
+
+    /* Reply Form */
+    .reply-form {
+        margin-top: 0.5rem;
+    }
+
+    .reply-form textarea {
+        width: 100%;
+        min-height: 50px;
+        font-size: 16px; /* Prevent zoom on iOS */
+        padding: 0.75rem;
+    }
+
+    .reply-form button {
+        width: 100%;
+        padding: 0.75rem;
+        margin-top: 0.5rem;
+    }
+
+    /* Comments Container */
+    .comments-container, .reply-comments-container {
+        max-height: 60vh;
+        padding: 0.5rem;
+    }
+
+    /* Thread Lines - Adjust for mobile */
+    .comment.reply-comment::before {
+        left: -0.5rem;
+        width: 2px;
+    }
+
+    /* Comment Content Typography */
+    .comment-content {
+        font-size: 0.95rem;
+        line-height: 1.4;
+    }
+
+    .comment.reply-comment .comment-content {
+        font-size: 0.9rem;
+    }
+
+    /* Comment Footer */
+    .comment-footer {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+
+    .comment-time {
+        font-size: 0.75rem;
+    }
+}
+
+/* Tablet styles */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .comments-section {
+        padding: 1.5rem;
+    }
+
+    .comments-list .comment {
+        padding: 1rem;
+    }
+
+    .comments-list .reply-comment {
+        margin-left: 2rem;
+    }
+
+    .comment-box-form {
+        flex-direction: row;
+        gap: 1rem;
+    }
+
+    .comment-box-form textarea {
+        flex: 1;
+    }
+
+    .comment-box-form button {
+        width: auto;
+        min-width: 100px;
+    }
+}
+
+/* Large screens */
+@media (min-width: 1025px) {
+    .comments-section {
+        padding: 2rem;
+    }
+
+    .comments-list .comment {
+        padding: 1.25rem;
+    }
+
+    .comments-list .reply-comment {
+        margin-left: 2.5rem;
+    }
+
+    .comment-box-form {
+        flex-direction: row;
+        gap: 1rem;
+    }
+
+    .comment-box-form textarea {
+        flex: 1;
+    }
+
+    .comment-box-form button {
+        width: auto;
+        min-width: 120px;
+    }
+}
+
+/* Very small screens (phones in portrait) */
+@media (max-width: 480px) {
+    .comments-section {
+        padding: 0.75rem;
+    }
+
+    .comments-list .comment {
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .comments-list .reply-comment {
+        margin-left: 0.5rem;
+        padding: 0.4rem;
+    }
+
+    .comment-avatar {
+        width: 30px !important;
+        height: 30px !important;
+    }
+
+    .comment-avatar img {
+        width: 30px !important;
+        height: 30px !important;
+    }
+
+    .comment.reply-comment .comment-avatar {
+        width: 24px !important;
+        height: 24px !important;
+    }
+
+    .comment.reply-comment .comment-avatar img {
+        width: 24px !important;
+        height: 24px !important;
+    }
+
+    .comment-actions {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .comments-list .comment-reply-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    .reply-comment-header {
+        padding: 0.5rem;
+    }
+
+    .reply-comment-header p {
+        font-size: 0.8rem;
+    }
+
+    .comment-content {
+        font-size: 0.9rem;
+    }
+
+    .comment.reply-comment .comment-content {
+        font-size: 0.85rem;
+    }
+
+    /* Ensure forms don't overflow on small screens */
+    .reply-form-container {
+        margin-left: 0;
+        margin-right: 0;
+        width: 100%;
+    }
+
+    /* Better touch targets for mobile */
+    .comment-actions button {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 0.5rem;
+    }
+
+    /* Prevent horizontal scroll */
+    .comments-section,
+    .comments-list,
+    .comment,
+    .reply-form-container {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    /* Improve text readability on small screens */
+    .comment-username {
+        font-size: 0.9rem !important;
+        font-weight: 600;
+    }
+
+    .comment-text {
+        font-size: 0.9rem !important;
+        line-height: 1.5;
+    }
+
+    /* Better spacing for reply forms */
+    .reply-form textarea {
+        resize: vertical;
+        max-height: 120px;
+    }
 }
 
 .auth-prompt {
