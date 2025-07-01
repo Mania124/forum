@@ -3471,7 +3471,7 @@ body.modal-open {
 
 .comments-list .comment-actions {
     display: flex;
-    gap: 0.5rem;
+    gap: 1rem;
     align-items: center;
     flex-wrap: wrap;
 }
@@ -3487,7 +3487,7 @@ body.modal-open {
     border: none;
     color: var(--muted-text);
     cursor: pointer;
-    padding: 0.4rem 0.6rem;
+    padding: 0.5rem 0.75rem;
     border-radius: var(--radius);
     transition: var(--transition);
     font-size: 0.85rem;
@@ -3495,7 +3495,7 @@ body.modal-open {
     align-items: center;
     gap: 0.4rem;
     user-select: none;
-    min-height: 32px;
+    min-height: 36px;
     white-space: nowrap;
     position: relative;
 }
@@ -3547,7 +3547,7 @@ body.modal-open {
     border: 1px solid var(--border-color);
     border-radius: 6px;
     font-weight: 500;
-    margin-left: 0.5rem;
+    margin-left: 0.25rem;
 }
 
 .comments-list .comment-reply-btn:hover {
@@ -3627,12 +3627,12 @@ body.modal-open {
     /* Comment Actions - Keep on same row but make more compact */
     .comment-actions {
         flex-wrap: wrap;
-        gap: 0.25rem;
+        gap: 0.75rem;
     }
 
     /* Make reaction buttons more compact on mobile */
     .comments-list .reaction-btn {
-        padding: 0.3rem 0.5rem;
+        padding: 0.4rem 0.6rem;
         font-size: 0.8rem;
         min-height: 36px;
         gap: 0.3rem;
@@ -3649,7 +3649,7 @@ body.modal-open {
         padding: 0.4rem 0.7rem;
         font-size: 0.85rem;
         min-height: 40px;
-        margin-left: 0.3rem;
+        margin-left: 0.2rem;
     }
 
     /* Reply Button - Full width on mobile */
@@ -3873,17 +3873,17 @@ body.modal-open {
     .comment-actions {
         flex-direction: row;
         flex-wrap: wrap;
-        gap: 0.2rem;
+        gap: 0.5rem;
         justify-content: flex-end;
     }
 
     /* Extra compact buttons for very small screens */
     .comments-list .reaction-btn {
-        padding: 0.25rem 0.4rem;
+        padding: 0.3rem 0.5rem;
         font-size: 0.75rem;
         min-height: 32px;
         min-width: 32px;
-        gap: 0.2rem;
+        gap: 0.25rem;
     }
 
     /* Ultra compact reaction counts */
@@ -3896,7 +3896,7 @@ body.modal-open {
         padding: 0.3rem 0.5rem;
         font-size: 0.8rem;
         min-height: 36px;
-        margin-left: 0.2rem;
+        margin-left: 0.1rem;
     }
 
     .comments-list .comment-reply-btn {
