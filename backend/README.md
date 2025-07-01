@@ -319,7 +319,7 @@ To run the backend with Docker, use the following commands:
 The backend application can be tested using tools like Postman or CURL to make requests to the above API endpoints.
 
 - **Unit tests**
-<!-- TODO -->
+- $ go test ./... --cover -v
 
 ## License
 

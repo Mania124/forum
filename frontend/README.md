@@ -193,16 +193,8 @@ To run the frontend of the forum application, ensure you are in the `frontend` d
      npm run dev
      ```
 
-   - **Access the Application**: Open your web browser and go to the URL specified in your script (usually `http://localhost:5173` or similar).
+   - **Access the Application**: Open your web browser and go to the URL specified in your script (usually `http://localhost:8000` or similar).
 
-3. **Using Python's HTTP Server**:
-   - Start a simple HTTP server to serve your static files. You can specify a port number (e.g., 8000) as follows:
-
-     ```bash
-     python3 -m http.server 8000
-     ```
-
-   - **Access the Application**: Open your web browser and go to `http://localhost:8000`.
 
 ## Deployment
 
