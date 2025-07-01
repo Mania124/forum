@@ -1170,7 +1170,9 @@ img {
 
 .comment-actions {
     display: flex;
-    gap: 4rem;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 .comment-actions button {
@@ -1189,9 +1191,12 @@ img {
 }
 
 .comment-footer {
-    padding-top: 0.3rem ;
+    padding-top: 0.3rem;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
 .comment .comment-wrapper {
@@ -3458,11 +3463,22 @@ body.modal-open {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
 }
 
 .comments-list .comment-actions {
     display: flex;
     gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Put timestamp and actions on same row */
+.comments-list .comment-footer .comment-time {
+    margin-right: auto;
+    flex-shrink: 0;
 }
 
 .comments-list .reaction-btn {
@@ -3470,14 +3486,16 @@ body.modal-open {
     border: none;
     color: var(--muted-text);
     cursor: pointer;
-    padding: 0.25rem 0.5rem;
+    padding: 0.4rem 0.6rem;
     border-radius: var(--radius);
     transition: var(--transition);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
     user-select: none;
+    min-height: 32px;
+    white-space: nowrap;
 }
 
 .comments-list .reaction-btn:hover {
@@ -3571,10 +3589,24 @@ body.modal-open {
         padding: 0.5rem;
     }
 
-    /* Comment Actions - Stack vertically on very small screens */
+    /* Comment Actions - Keep on same row but make more compact */
     .comment-actions {
         flex-wrap: wrap;
-        gap: 0.5rem;
+        gap: 0.25rem;
+    }
+
+    /* Make reaction buttons more compact on mobile */
+    .comments-list .reaction-btn {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.8rem;
+        min-height: 36px;
+    }
+
+    /* Reply button slightly larger for better touch target */
+    .comments-list .comment-reply-btn {
+        padding: 0.4rem 0.7rem;
+        font-size: 0.85rem;
+        min-height: 40px;
     }
 
     /* Reply Button - Full width on mobile */
@@ -3681,11 +3713,19 @@ body.modal-open {
         font-size: 0.9rem;
     }
 
-    /* Comment Footer */
+    /* Comment Footer - Keep on same row but allow wrapping */
     .comment-footer {
-        flex-direction: column;
+        flex-direction: row;
+        flex-wrap: wrap;
         gap: 0.5rem;
-        align-items: flex-start;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    /* Ensure timestamp takes available space */
+    .comment-time {
+        flex: 1;
+        min-width: 80px;
     }
 
     .comment-time {
@@ -3788,8 +3828,24 @@ body.modal-open {
     }
 
     .comment-actions {
-        flex-direction: column;
-        gap: 0.25rem;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.2rem;
+        justify-content: flex-end;
+    }
+
+    /* Extra compact buttons for very small screens */
+    .comments-list .reaction-btn {
+        padding: 0.25rem 0.4rem;
+        font-size: 0.75rem;
+        min-height: 32px;
+        min-width: 32px;
+    }
+
+    .comments-list .comment-reply-btn {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.8rem;
+        min-height: 36px;
     }
 
     .comments-list .comment-reply-btn {
@@ -3820,11 +3876,11 @@ body.modal-open {
         width: 100%;
     }
 
-    /* Better touch targets for mobile */
+    /* Better touch targets for mobile - but keep compact */
     .comment-actions button {
-        min-height: 44px;
-        min-width: 44px;
-        padding: 0.5rem;
+        min-height: 40px;
+        min-width: 40px;
+        padding: 0.4rem;
     }
 
     /* Prevent horizontal scroll */
@@ -3851,6 +3907,27 @@ body.modal-open {
     .reply-form textarea {
         resize: vertical;
         max-height: 120px;
+    }
+
+    /* Ensure comment footer doesn't break on small screens */
+    .comment-footer {
+        min-height: 40px;
+    }
+
+    /* Make sure timestamp doesn't take too much space */
+    .comment-time {
+        font-size: 0.7rem;
+        flex-shrink: 1;
+        max-width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Ensure all buttons stay on same row */
+    .comment-actions {
+        flex-shrink: 0;
+        min-width: fit-content;
     }
 }
 
