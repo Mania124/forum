@@ -303,20 +303,9 @@ func GetPostComments(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var fullComments []models.Comment
-
-	for _, comment := range comments {
-		userInfo, err := sqlite.GetUserByID(db, comment.UserID)
-		if err != nil {
-			utils.SendJSONError(w, "Failed to fetch comment user information", http.StatusInternalServerError)
-			return
-		}
-		comment.UserName = userInfo.Username
-		comment.ProfileAvatar = userInfo.AvatarURL
-
-		fullComments = append(fullComments, comment)
-
-	}
+	// Comments already have user info populated from the SQL query
+	// Just return them directly to preserve the Replies field
+	fullComments := comments
 
 	utils.SendJSONResponse(w, fullComments, http.StatusOK)
 }
