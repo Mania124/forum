@@ -88,30 +88,34 @@ forum/
 ├── backend/
 │   ├── sqlite/               # SQLite database setup and queries
 │   │   ├── database.go       # Database connection and initialization
+│   │   ├── database_test.go  # Database connection and initialization test
+│   │   ├── queries_test.go   # SQL queries test
 │   │   └── queries.go        # SQL queries (CREATE, INSERT, SELECT, etc.)
 │   ├── models/               # Data models (structs for users, posts, comments, etc.)
 │   │   ├── user.go
+│   │   ├── trends.go
+│   │   ├── models_test.go
 │   │   ├── post.go
 │   │   ├── comment.go
 │   │   └── category.go
 │   ├── handlers/             # HTTP handlers (logic for handling requests)
 │   │   ├── auth.go           # Authentication handlers (register, login, logout)
+│   │   ├── auth_test.go      # Authentication handlers (register, login, logout)test
 │   │   ├── post.go           # Post-related handlers (create, read, update, delete)
+│   │   ├── categoty.go       # list of categoties
 │   │   ├── comment.go        # Comment-related handlers
 │   │   └── like.go           # Like/dislike handlers
-│   ├── controllers/          # Business logic (if needed, can merge with handlers)
-│   │   ├── auth_controller.go
-│   │   ├── post_controller.go
-│   │   └── comment_controller.go
 │   ├── routes/               # API routes
 │   │   └── routes.go         # Define all API endpoints
 │   ├── middleware/           # Middleware (authentication, logging, etc.)
 │   │   ├── auth.go           # Auth middleware (check if user is logged in)
-│   │   └── logger.go         # Logging middleware
+│   │   └── cors.go           # cross-origin resource sharing
 │   ├── main.go               # Entry point for the backend
 │   └── utils/                # Utility functions (e.g., password hashing, UUID generation)
 │       ├── auth_utils.go
+│       ├── auth_utils_test.go
 │       └── response_utils.go # Helper functions for JSON responses
+│       └── response_utils_test.go 
 ├── frontend/
 │   ├── index.html            # Main HTML file
 │   ├── app.js                # Main JavaScript file for frontend logic
@@ -123,6 +127,11 @@ forum/
 │   └── assets/               # Static assets (images, icons, etc.)
 ├── Dockerfile                # Dockerfile for containerizing the backend
 ├── docker-compose.yml        # Docker Compose file for multi-container setup
+├── docker-compose.serve.yml # Docker Compose file for multi-container setup during develop
+├── Makefile                  # Excecutable commands for building and running the app using make tool
+├── start-forum.sh            # Script for starting the containerised application
+├── stop-forum.sh            # Script for stopping the containerised application
+├── test-docker.sh            # Testing Docker containerization setup.
 └── README.md                 # Project documentation
 ```
 
@@ -140,8 +149,8 @@ forum/
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/forum-project.git
-   cd forum-project
+   git clone https://learn.zone01kisumu.ke/git/hshikuku/forum.git
+   cd forum
    ```
 
 2. Build and run the application using Docker:
@@ -211,13 +220,14 @@ forum/
 
 ---
 
-## Bonus Tasks
+## Authors
+- [Barrack Otieno](http://www.github.com/baraq23)
+- [Hezborn Shikuku](http://www.github.com/Mania124)
+- [Otieno Ragwel](http://www.github.com/Oragwel)
+- [Moffat Mokwa](https://learn.zone01kisumu.ke/git/mmoffat)
+- [Samuel Omulo](http://www.github.com/Somulo1)
 
-1. Implement UUIDs for session management.
-2. Add frontend styling using CSS to make the forum visually appealing.
-3. Implement pagination for posts and comments.
-4. Allow users to edit or delete their posts and comments.
-5. Add a search functionality for posts.
+
 
 ---
 
