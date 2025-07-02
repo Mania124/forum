@@ -11,12 +11,13 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
-
+	"bytes"
+	
 	"forum/models"
 	"forum/sqlite"
 	"forum/utils"
 )
-
+const maxImageSize = 20 << 20 // 20 MB limit for images
 // CreatePost creates a new post
 func CreatePost(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -86,7 +87,17 @@ func CreatePost(db *sql.DB, w http.ResponseWriter, r *http.Request) {
 	file, header, err := r.FormFile("image")
 	if err == nil {
 		defer file.Close()
-
+		limitedReader := io.LimitReader(file, maxImageSize+1)
+		var buf bytes.Buffer
+		n, err := io.Copy(&buf, limitedReader)
+		if err != nil {
+			http.Error(w, "Failed to read image", http.StatusInternalServerError)
+			return
+		}
+		if n > maxImageSize {
+			http.Error(w, "Image exceeds 20MB limit", http.StatusBadRequest)
+			return
+		}	
 		ext := filepath.Ext(header.Filename)
 		filename := fmt.Sprintf("post_%s_%d%s", userID, time.Now().UnixNano(), ext)
 		dstPath := filepath.Join("static/pictures", filename)
